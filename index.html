@@ -1,0 +1,1412 @@
+<title>Zapee Command Deck</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --text-400:#2d2a24; --text-300:#5f5646;
+  --bg:#f5efe6;
+  --beige-500:rgb(241,229,213); --beige-600:rgb(233,222,208); --beige-700:rgb(223,209,188);
+  --gray-500:#67727c; --gray-400:#a9b0b7;
+  --orange:#ff8400; --orange-tint:#ffead0; --white:#ffffff;
+  --cyan-500:#0086bb; --cyan-400:rgb(52,191,255);
+  --blue-500:#052e87; --blue-600:#234ba2;
+  --good:#2f8f6b; --good-tint:#e4f0ea;
+  --warn:#b5791f; --warn-tint:#f6ecd8;
+  --critical:#c23b2e; --critical-tint:#f7dfda;
+  --radius-sm:6px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
+  --ease-smooth:cubic-bezier(.6,0,.25,1);
+  --ease-out:cubic-bezier(.25,.46,.45,.94);
+  --space-xxs:4px; --space-xs:8px; --space-sm:12px; --space-md:16px; --space-lg:20px; --space-xl:28px;
+}
+/* Deliberately single-theme: always the light beige/orange look, regardless of viewer system theme. */
+:root{color-scheme:light;}
+*,*:before,*:after{box-sizing:border-box;margin:0;padding:0;}
+html{background:var(--bg);}
+body{
+  font-family:'Urbanist',system-ui,-apple-system,sans-serif;
+  background:var(--bg);color:var(--text-400);
+  letter-spacing:.02em; line-height:1.3;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:'Urbanist',sans-serif;font-weight:700;line-height:1.1;text-wrap:balance;}
+.mono{font-variant-numeric:tabular-nums;}
+a{color:inherit;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px;}
+
+header.masthead{padding:34px 0 22px;}
+.masthead-row{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between;}
+.masthead-title{font-size:clamp(30px,4vw,44px);}
+.masthead-sub{font-weight:500;color:var(--text-300);font-size:14px;margin-top:6px;max-width:560px;}
+.stamp{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--blue-500);color:#e1f5ff;
+  font-weight:700;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+  padding:9px 15px;border-radius:var(--radius-sm);
+}
+.stamp::before{content:"●";color:var(--cyan-400);font-size:8px;}
+.meta-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+.chip{
+  font-size:11.5px;font-weight:600;background:var(--white);border-radius:999px;
+  padding:6px 12px;color:var(--text-300);box-shadow:0 1px 2px rgba(45,42,36,.06);
+}
+
+/* PERSISTENT VITALS — always visible so status isn't lost while switching tabs */
+.vitals-bar{position:sticky;top:0;z-index:21;background:var(--bg);padding-top:6px;}
+.vitals{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:8px 0 10px;}
+.vital{background:var(--white);border-radius:var(--radius-md);padding:12px 16px;box-shadow:0 1px 2px rgba(45,42,36,.06);}
+.vital-label{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-300);}
+.vital-value{font-size:24px;font-weight:800;margin-top:3px;}
+.vital-value.crit{color:var(--critical);} .vital-value.warn{color:var(--warn);} .vital-value.good{color:var(--good);}
+.vital-note{font-size:11px;color:var(--text-300);margin-top:2px;font-weight:600;}
+@media (max-width:640px){.vitals{grid-template-columns:repeat(2,1fr);}}
+
+/* CAROUSEL */
+.carousel{margin-top:0;}
+.fr-radio{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;}
+.carousel-nav{
+  display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:0 0 14px;border-bottom:1px solid var(--beige-700);margin-bottom:26px;
+}
+.tabs{display:flex;gap:3px;flex-wrap:wrap;background:var(--white);border-radius:999px;padding:5px;box-shadow:0 1px 2px rgba(45,42,36,.06);}
+.tabs label{
+  font-weight:600;font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;
+  padding:9px 15px;border-radius:999px;color:var(--text-300);cursor:pointer;
+  transition:background-color .2s var(--ease-smooth), color .2s var(--ease-smooth);
+  display:inline-flex;align-items:center;gap:6px;
+}
+.tabs label:hover{background:var(--beige-500);}
+.tab-dot{width:6px;height:6px;border-radius:50%;background:var(--critical);}
+.tab-dot--warn{background:var(--warn);}
+.mt-sm{margin-top:var(--space-sm);}
+.mt-lg{margin-top:var(--space-lg);}
+.arrows{display:flex;gap:8px;}
+.arrow{
+  width:36px;height:36px;border-radius:50%;background:var(--white);
+  display:none;align-items:center;justify-content:center;cursor:pointer;
+  font-size:15px;font-weight:700;color:var(--text-400);
+  box-shadow:0 1px 2px rgba(45,42,36,.08);
+  transition:background-color .2s var(--ease-smooth), color .2s var(--ease-smooth), transform .2s var(--ease-out);
+}
+.arrow:hover{background:var(--orange);color:#fff;transform:translateY(-1px);}
+.panel{display:none;animation:none;}
+.panel-inner{padding-bottom:10px;}
+
+#fr1:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr1"],
+#fr2:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr2"],
+#fr3:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr3"],
+#fr4:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr4"],
+#fr5:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr5"],
+#fr6:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr6"],
+#fr7:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr7"]{background:var(--orange);color:#fff;}
+#fr1:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr1"] .tab-dot,
+#fr5:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr5"] .tab-dot{background:#fff;}
+
+#fr1:checked ~ .panels .panel[data-panel="1"],
+#fr2:checked ~ .panels .panel[data-panel="2"],
+#fr3:checked ~ .panels .panel[data-panel="3"],
+#fr4:checked ~ .panels .panel[data-panel="4"],
+#fr5:checked ~ .panels .panel[data-panel="5"],
+#fr6:checked ~ .panels .panel[data-panel="6"],
+#fr7:checked ~ .panels .panel[data-panel="7"]{display:block;}
+
+#fr1:checked ~ .vitals-bar .carousel-nav .arrows .arrow[data-show="1"],
+#fr2:checked ~ .vitals-bar .carousel-nav .arrows .arrow[data-show="2"],
+#fr3:checked ~ .vitals-bar .carousel-nav .arrows .arrow[data-show="3"],
+#fr4:checked ~ .vitals-bar .carousel-nav .arrows .arrow[data-show="4"],
+#fr5:checked ~ .vitals-bar .carousel-nav .arrows .arrow[data-show="5"],
+#fr6:checked ~ .vitals-bar .carousel-nav .arrows .arrow[data-show="6"],
+#fr7:checked ~ .vitals-bar .carousel-nav .arrows .arrow[data-show="7"]{display:flex;}
+
+/* SECTION HEADS */
+.eyebrow{display:inline-block;background:var(--blue-500);color:#e1f5ff;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:var(--radius-sm);margin-bottom:8px;}
+.panel h2{font-size:24px;margin-bottom:6px;}
+.panel-note{font-size:13.5px;color:var(--text-300);max-width:620px;margin-bottom:22px;}
+.subhead{font-size:15px;font-weight:700;margin:30px 0 12px;}
+
+/* KPI TILES */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px;}
+@media (max-width:760px){.kpi-row{grid-template-columns:repeat(2,1fr);}}
+.kpi-row--3{grid-template-columns:repeat(3,1fr);}
+.kpi-tile{background:var(--white);border-radius:var(--radius-md);padding:16px 18px;box-shadow:0 1px 2px rgba(45,42,36,.05);border-left:4px solid var(--orange);}
+.kpi-tile--arlene{border-left-color:var(--orange);}
+.kpi-tile--arvin{border-left-color:var(--blue-500);}
+.kpi-tile--raymond{border-left-color:var(--cyan-500);}
+.kpi-label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-300);}
+.kpi-value{font-size:32px;font-weight:800;margin-top:4px;}
+.kpi-indicator{font-size:11.5px;font-weight:600;margin-top:4px;}
+.kpi-indicator.good{color:var(--good);} .kpi-indicator.warn{color:var(--warn);} .kpi-indicator.crit{color:var(--critical);}
+
+/* GENERIC CARDS */
+.card{background:var(--white);border-radius:var(--radius-md);padding:18px;box-shadow:0 1px 2px rgba(45,42,36,.05);}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;}
+@media (max-width:860px){.grid-4{grid-template-columns:repeat(2,1fr);} .grid-3{grid-template-columns:1fr;} .grid-2{grid-template-columns:1fr;}}
+@media (max-width:520px){.grid-4{grid-template-columns:1fr;}}
+
+.pill{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:4px 10px;border-radius:999px;}
+.pill-good{background:var(--good-tint);color:var(--good);}
+.pill-warn{background:var(--warn-tint);color:var(--warn);}
+.pill-crit{background:var(--critical-tint);color:var(--critical);}
+.pill-neutral{background:var(--beige-600);color:var(--text-300);}
+.pill--tile{display:block;width:fit-content;margin-top:var(--space-xs);}
+.card-note{font-size:12px;color:var(--text-300);margin-top:var(--space-xs);}
+.card-lede{font-size:13px;margin-top:var(--space-xs);}
+.card h3{font-size:15px;}
+
+.callout{border-radius:var(--radius-md);padding:14px 18px;margin-bottom:18px;}
+.callout.crit{background:var(--critical-tint);}
+.callout.good{background:var(--good-tint);}
+.callout.info{background:var(--orange-tint);}
+.callout.warn{background:var(--warn-tint);}
+.callout-title{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px;}
+.callout p{font-size:13.5px;margin-bottom:5px;}
+.callout p:last-child{margin-bottom:0;}
+
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-300);border-bottom:2px solid var(--text-400);padding:8px 10px;}
+td{padding:9px 10px;border-bottom:1px solid var(--beige-700);vertical-align:top;}
+tr:hover td{background:var(--beige-500);}
+.table-wrap{overflow-x:auto;background:var(--white);border-radius:var(--radius-md);}
+
+figure{margin:0;padding:16px;background:var(--white);border-radius:var(--radius-md);}
+figure svg{width:100%;height:auto;display:block;}
+figcaption{font-size:12px;color:var(--text-300);margin-top:8px;text-align:center;}
+.fig-legend{display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap;}
+.fig-legend span{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--text-300);}
+.fig-legend i{width:9px;height:9px;border-radius:3px;display:inline-block;}
+.fig-legend i.owner-arlene{background:var(--orange);}
+.fig-legend i.owner-raymond{background:var(--cyan-500);}
+.fig-legend i.owner-arvin{background:none;border:2px solid var(--blue-500);}
+.fig-wrap{overflow-x:auto;}
+
+.docket-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;}
+.docket-col{background:var(--white);border-radius:var(--radius-md);overflow:hidden;}
+.docket-col-head{background:var(--beige-500);padding:9px 12px;display:flex;justify-content:space-between;align-items:center;}
+.docket-col-head h4{font-size:12px;letter-spacing:.03em;text-transform:uppercase;}
+.docket-count{font-size:11px;color:var(--text-300);font-weight:600;}
+.docket-list{padding:8px;display:flex;flex-direction:column;gap:7px;}
+.task{border-radius:var(--radius-sm);padding:8px 10px;background:var(--beige-500);}
+.task--resolved{background:var(--good-tint);}
+.task-title{font-size:12.5px;font-weight:600;}
+.task-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+.task-phase{font-size:10px;color:var(--text-300);}
+.task-due{font-size:10px;font-weight:600;}
+.task-due.overdue{color:var(--critical);}
+.task-assignee{font-size:10px;background:var(--white);border-radius:var(--radius-sm);padding:1px 6px;}
+.empty-col{padding:14px;font-size:12px;color:var(--text-300);text-align:center;font-style:italic;}
+
+.stepper{display:flex;flex-wrap:wrap;gap:10px;}
+.step{flex:1;min-width:150px;background:var(--white);border-radius:var(--radius-md);padding:13px 14px;}
+.step-days{font-size:10.5px;font-weight:700;color:var(--orange);}
+.step h4{font-size:12.5px;margin-top:4px;}
+.step p{font-size:12px;color:var(--text-300);margin-top:6px;}
+
+/* honest stacked allocation bar (segments sized to real ₱ share of the 1,000,000 pot) */
+.alloc-bar{display:flex;height:26px;border-radius:var(--radius-sm);overflow:hidden;}
+.alloc-legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:14px;}
+.alloc-item{display:flex;gap:9px;align-items:flex-start;}
+.alloc-item i{width:10px;height:10px;border-radius:3px;margin-top:3px;flex-shrink:0;}
+.alloc-item .a-name{display:block;font-size:12.5px;font-weight:700;}
+.alloc-item .a-range{display:block;font-size:11.5px;color:var(--text-300);font-weight:600;}
+.alloc-seg--inventory,.alloc-item i.swatch--inventory{background:var(--orange);}
+.alloc-seg--ads,.alloc-item i.swatch--ads{background:var(--blue-500);}
+.alloc-seg--ops,.alloc-item i.swatch--ops{background:var(--cyan-500);}
+.alloc-seg--reserve,.alloc-item i.swatch--reserve{background:var(--good);}
+.alloc-seg--buffer,.alloc-item i.swatch--buffer{background:var(--beige-600);}
+
+.role-card{background:var(--white);border-radius:var(--radius-md);padding:16px;}
+.role-name{font-size:15px;font-weight:700;}
+.role-title{color:var(--orange);font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;margin:3px 0 10px;}
+.role-card ul{padding-left:18px;font-size:13px;}
+
+.override{border-radius:var(--radius-md);background:var(--warn-tint);padding:12px 14px;font-size:12.5px;margin-top:10px;}
+.override strong{color:var(--warn);}
+
+details{background:var(--white);border-radius:var(--radius-md);margin-bottom:8px;overflow:hidden;}
+summary{cursor:pointer;padding:13px 16px;font-weight:700;font-size:13px;letter-spacing:.02em;text-transform:uppercase;list-style:none;display:flex;justify-content:space-between;align-items:center;}
+summary::-webkit-details-marker{display:none;}
+summary::after{content:"+";color:var(--text-300);font-size:16px;}
+details[open] summary::after{content:"–";}
+.details-body{padding:0 16px 16px;font-size:13.5px;}
+.details-body ul{padding-left:18px;}
+.details-body li{margin-bottom:5px;}
+.details-body p{margin-bottom:var(--space-xs);}
+.details-body p:last-child{margin-bottom:0;}
+
+/* WORKFLOW NODE POPUPS */
+.wf-node-link{cursor:pointer;}
+.wf-node-link rect{transition:filter .15s ease;}
+.wf-node-link:hover rect{filter:brightness(.93);}
+.wf-modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(45,42,36,.6);align-items:center;justify-content:center;padding:20px;}
+.wf-modal:target{display:flex;}
+.wf-modal-card{background:var(--white);border-radius:var(--radius-lg);max-width:600px;width:100%;max-height:85vh;overflow-y:auto;padding:26px;position:relative;}
+.wf-modal-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:var(--beige-500);display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--text-400);font-size:15px;font-weight:700;}
+.wf-modal-close:hover{background:var(--orange);color:#fff;}
+.wf-modal-badge{display:inline-block;font-family:inherit;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em;margin-bottom:10px;background:var(--orange);color:#fff;}
+.wf-modal-badge.raymond{background:var(--cyan-500);}
+.wf-modal-badge.arvin{background:var(--blue-500);}
+.wf-role-note{background:var(--warn-tint);border-radius:var(--radius-sm);padding:8px 11px;font-size:11px;color:var(--warn);font-style:italic;margin-bottom:12px;}
+.wf-modal-title{font-size:19px;margin-bottom:14px;}
+.wf-modal-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--beige-700);border-radius:var(--radius-md);overflow:hidden;margin-bottom:16px;}
+.wf-modal-meta-item{background:var(--beige-500);padding:9px 10px;}
+.wf-modal-meta-item .k{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text-300);}
+.wf-modal-meta-item .v{font-size:11px;font-weight:600;margin-top:2px;}
+.wf-steps{list-style:none;counter-reset:wfstep;margin-bottom:14px;}
+.wf-steps li{counter-increment:wfstep;position:relative;padding:7px 0 7px 32px;font-size:13px;border-bottom:1px solid var(--beige-600);}
+.wf-steps li:last-child{border-bottom:none;}
+.wf-steps li::before{content:counter(wfstep);position:absolute;left:0;top:6px;width:21px;height:21px;border-radius:50%;background:var(--orange);color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.wf-kpi{background:var(--good-tint);border-radius:var(--radius-md);padding:11px 13px;font-size:12px;}
+.wf-kpi strong{color:var(--good);}
+.wf-escalation{background:var(--warn-tint);border-radius:var(--radius-md);padding:11px 13px;font-size:12px;margin-top:8px;}
+.wf-escalation strong{color:var(--warn);}
+.wf-no-sop{background:var(--beige-500);border-radius:var(--radius-md);padding:11px 13px;font-size:12px;font-style:italic;color:var(--text-300);margin-bottom:12px;}
+
+/* DOCS TAB */
+.toc-card{background:var(--white);border-radius:var(--radius-md);padding:16px 20px;margin-bottom:24px;}
+.toc-card h4{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-300);margin-bottom:10px;}
+.toc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 24px;}
+@media (max-width:700px){.toc-grid{grid-template-columns:1fr;}}
+.toc-grid a{display:block;font-size:13px;font-weight:600;padding:5px 0;color:var(--text-400);border-bottom:1px dotted var(--beige-700);}
+.toc-grid a:hover{color:var(--orange);}
+.doc-anchor{scroll-margin-top:100px;}
+.platform-card{background:var(--white);border-radius:var(--radius-md);padding:18px;}
+.platform-card h3{font-size:15px;margin-bottom:3px;}
+.platform-url{font-family:monospace;font-size:11.5px;color:var(--orange);word-break:break-all;}
+.platform-card .subhead{margin:14px 0 6px;font-size:12px;}
+.platform-card ul{padding-left:18px;font-size:12.5px;color:var(--text-300);}
+.platform-card li{margin-bottom:4px;}
+.appendix-card{background:var(--white);border-radius:var(--radius-md);padding:14px 16px;}
+.appendix-card .a-code{font-family:monospace;font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.03em;}
+.appendix-card h4{font-size:13px;margin:3px 0 6px;}
+.appendix-card p{font-size:12px;color:var(--text-300);}
+.mini-checklist{list-style:none;padding:0;}
+.mini-checklist li{padding:5px 0 5px 22px;position:relative;font-size:12.5px;border-bottom:1px solid var(--beige-600);}
+.mini-checklist li:last-child{border-bottom:none;}
+.mini-checklist li::before{content:"☐";position:absolute;left:0;color:var(--text-300);}
+.script-table td:first-child{font-weight:600;white-space:nowrap;}
+.script-table td:last-child{font-style:italic;}
+
+/* WATERFALL LIST (replaces the old 4-line SVG version — too many real deduction lines to hand-place in SVG) */
+.waterfall-list{background:var(--white);border-radius:var(--radius-md);overflow:hidden;}
+.wf-row{display:flex;justify-content:space-between;padding:9px 16px;font-size:12.5px;border-bottom:1px solid var(--beige-600);}
+.wf-row:last-child{border-bottom:none;}
+.wf-row em{font-style:normal;color:var(--text-300);font-size:11px;}
+.wf-row-top{font-weight:700;font-size:13px;background:var(--beige-500);}
+.wf-row-new{background:var(--good-tint);}
+.wf-row-new em{color:var(--good);}
+.wf-row-total{font-weight:800;font-size:14px;background:var(--orange-tint);color:var(--orange);}
+.split-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px;}
+.split-tile{border-radius:var(--radius-md);padding:14px;text-align:center;color:#fff;}
+.split-tile .name{font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;opacity:.9;}
+.split-tile .pct{font-size:22px;font-weight:800;margin-top:2px;}
+.break-even-good{color:var(--good);font-weight:700;}
+.break-even-warn{color:var(--warn);font-weight:700;}
+
+.reference-section{margin-top:16px;padding-top:36px;border-top:1px solid var(--beige-700);}
+.reference-section h2{margin-bottom:var(--space-md);}
+
+footer{padding:30px 0 50px;}
+footer p{font-size:11.5px;color:var(--text-300);margin:3px 0;}
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="masthead-row">
+      <div>
+        <h1 class="masthead-title">Zapee Command Deck</h1>
+        <div class="masthead-sub">Zapee World Online Store — internal operations dashboard, synthesized from the SOP, the 4-Pillar Handbook, the Content Engine Playbook, and the live Kanban board</div>
+      </div>
+      <div class="stamp">Trial Phase — Learning Roles Before Scaling (target 2027)</div>
+    </div>
+    <div class="meta-chips">
+      <span class="chip">Sole Proprietorship — Arlene Zapanta Baluyut</span>
+      <span class="chip">Santa Monica, Santa Rita, Pampanga</span>
+      <span class="chip">Shopee · Lazada · TikTok Shop</span>
+      <span class="chip">Split 40 / 30 / 30</span>
+      <span class="chip">Board synced 2026-08-21</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+<div class="carousel">
+  <input type="radio" name="fr" id="fr1" class="fr-radio" checked>
+  <input type="radio" name="fr" id="fr2" class="fr-radio">
+  <input type="radio" name="fr" id="fr3" class="fr-radio">
+  <input type="radio" name="fr" id="fr4" class="fr-radio">
+  <input type="radio" name="fr" id="fr5" class="fr-radio">
+  <input type="radio" name="fr" id="fr6" class="fr-radio">
+  <input type="radio" name="fr" id="fr7" class="fr-radio">
+
+  <div class="vitals-bar">
+    <div class="vitals">
+      <div class="vital"><div class="vital-label">Total Tasks</div><div class="vital-value mono">32</div><div class="vital-note">6 columns</div></div>
+      <div class="vital"><div class="vital-label">Overdue</div><div class="vital-value mono crit">3</div><div class="vital-note">up to 61 days</div></div>
+      <div class="vital"><div class="vital-label">In Progress</div><div class="vital-value mono warn">4</div><div class="vital-note">2 overdue</div></div>
+      <div class="vital"><div class="vital-label">Done</div><div class="vital-value mono good">7</div><div class="vital-note">22% of board</div></div>
+    </div>
+    <div class="carousel-nav">
+      <div class="tabs">
+        <label for="fr1">Snapshot<span class="tab-dot"></span></label>
+        <label for="fr2">Workflow</label>
+        <label for="fr3">Team</label>
+        <label for="fr4">Money</label>
+        <label for="fr5">Compliance<span class="tab-dot tab-dot--warn"></span></label>
+        <label for="fr6">Content</label>
+        <label for="fr7">Docs</label>
+      </div>
+      <div class="arrows">
+        <label class="arrow" data-show="2" for="fr1">‹</label>
+        <label class="arrow" data-show="3" for="fr2">‹</label>
+        <label class="arrow" data-show="4" for="fr3">‹</label>
+        <label class="arrow" data-show="5" for="fr4">‹</label>
+        <label class="arrow" data-show="6" for="fr5">‹</label>
+        <label class="arrow" data-show="7" for="fr6">‹</label>
+        <label class="arrow" data-show="1" for="fr2">›</label>
+        <label class="arrow" data-show="2" for="fr3">›</label>
+        <label class="arrow" data-show="3" for="fr4">›</label>
+        <label class="arrow" data-show="4" for="fr5">›</label>
+        <label class="arrow" data-show="5" for="fr6">›</label>
+        <label class="arrow" data-show="6" for="fr7">›</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="panels">
+
+    <!-- PANEL 1 — SNAPSHOT -->
+    <section class="panel" data-panel="1">
+      <div class="panel-inner">
+        <span class="eyebrow">01 · Live</span>
+        <h2>Operations Snapshot</h2>
+        <p class="panel-note">4-Pillar health plus the actual Zapee Board — pulled from Supabase 2026-08-21, 32 tasks across 6 columns.</p>
+
+        <div class="callout crit">
+          <div class="callout-title">⚠ Overdue — 3 items</div>
+          <p><strong>Obtain Clearances and Permits</strong> — Arlene, Legal, urgent — due 2026-06-21, ~61 days overdue, still in Review.</p>
+          <p><strong>Build initial product shortlist</strong> — Raymond, Product, high — due 2026-06-21, ~61 days overdue, still In Progress.</p>
+          <p><strong>Add business and bank details to all stores</strong> — Arlene, Finance, urgent — due 2026-08-08, 13 days overdue, still In Progress.</p>
+        </div>
+        <div class="callout good">
+          <div class="callout-title">✓ Ready to close out</div>
+          <p><strong>Create internal operating agreement</strong> (To Do/Assigning, urgent, Legal) — done as of the 2026-08-21 session. SOP now reflects the 40/30/30 split, the new roles, and the opt-in salary clause. Move this card to Done.</p>
+        </div>
+
+        <div class="subhead">4-Pillar Health</div>
+        <div class="grid-4">
+          <div class="card"><div class="kpi-label">Content</div><span class="pill pill-crit pill--tile">Not started</span><p class="card-note">Photos, listings, and TikTok content all still in Backlog (Week 6). Gated behind SKU selection (Week 4).</p></div>
+          <div class="card"><div class="kpi-label">Sales</div><span class="pill pill-warn pill--tile">Mixed signal</span><p class="card-note">SOP says seller accounts Active; board says still In Progress. Reconcile before assuming they're live.</p></div>
+          <div class="card"><div class="kpi-label">Delivery</div><span class="pill pill-warn pill--tile">Decided, not executed</span><p class="card-note">Sea freight chosen for the first batch. CargoBoss account/import task still To Do.</p></div>
+          <div class="card"><div class="kpi-label">Operations</div><span class="pill pill-crit pill--tile">3 overdue</span><p class="card-note">Partnership agreement effectively done today. BIR/permits, bank account, product shortlist all past due.</p></div>
+        </div>
+
+        <div class="subhead">Board</div>
+        <div class="docket-grid">
+          <div class="docket-col">
+            <div class="docket-col-head"><h4>Backlog</h4><span class="docket-count mono">14</span></div>
+            <div class="docket-list">
+              <div class="task"><div class="task-title">Gather supplier quotes</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-phase">Wk4 · Operations</span></div></div>
+              <div class="task"><div class="task-title">Check competitor prices (Shopee/Lazada/TikTok)</div><div class="task-meta"><span class="pill pill-neutral">medium</span><span class="task-phase">Wk4 · Product</span></div></div>
+              <div class="task"><div class="task-title">Estimate pricing and margins</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-phase">Wk4 · Finance</span></div></div>
+              <div class="task"><div class="task-title">Pick priority launch SKUs</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-phase">Wk4 · Product</span></div></div>
+              <div class="task"><div class="task-title">Confirm tax type and filing schedule</div><div class="task-meta"><span class="pill pill-crit">urgent</span><span class="task-phase">Wk5 · Legal</span></div></div>
+              <div class="task"><div class="task-title">Confirm priority suppliers and payment terms</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-phase">Wk5 · Operations</span></div></div>
+              <div class="task"><div class="task-title">Finalize packaging concept</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-phase">Wk5 · Product</span></div></div>
+              <div class="task"><div class="task-title">Check labeling requirements</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-phase">Wk5 · Legal</span></div></div>
+              <div class="task"><div class="task-title">Build product economics sheet</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-phase">Wk5 · Finance</span></div></div>
+              <div class="task"><div class="task-title">Prepare product photos</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-phase">Wk6 · Brand</span></div></div>
+              <div class="task"><div class="task-title">Upload product listings to all stores</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-phase">Wk6 · Operations</span></div></div>
+              <div class="task"><div class="task-title">Set shipping options</div><div class="task-meta"><span class="pill pill-neutral">medium</span><span class="task-phase">Wk6 · Operations</span></div></div>
+              <div class="task"><div class="task-title">Create launch vouchers / discounts</div><div class="task-meta"><span class="pill pill-neutral">medium</span><span class="task-phase">Wk6 · Marketing</span></div></div>
+              <div class="task"><div class="task-title">Define first-month launch targets</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-phase">Wk6 · Marketing</span></div></div>
+            </div>
+          </div>
+          <div class="docket-col">
+            <div class="docket-col-head"><h4>To Do / Assigning</h4><span class="docket-count mono">6</span></div>
+            <div class="docket-list">
+              <div class="task task--resolved"><div class="task-title">Create internal operating agreement</div><div class="task-meta"><span class="pill pill-crit">urgent</span><span class="task-phase">Wk1 · Legal</span><span class="pill pill-good">done today</span></div></div>
+              <div class="task"><div class="task-title">Import and logistics (CargoBoss)</div><div class="task-meta"><span class="pill pill-neutral">medium</span><span class="task-assignee">Raymond</span></div></div>
+              <div class="task"><div class="task-title">Create shared Drive / Notion folder</div><div class="task-meta"><span class="pill pill-neutral">medium</span><span class="task-phase">Wk2 · Admin</span><span class="task-assignee">Arvin</span></div></div>
+              <div class="task"><div class="task-title">Expense Tracker / Bookkeeping method</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-phase">Wk5 · Finance</span></div></div>
+              <div class="task"><div class="task-title">Brand and trademark</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-phase">Wk2 · Brand</span><span class="task-assignee">Arvin</span></div></div>
+              <div class="task"><div class="task-title">Business Research Brief — Product, Customer &amp; Market</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-assignee">Raymond</span></div></div>
+            </div>
+          </div>
+          <div class="docket-col">
+            <div class="docket-col-head"><h4>In Progress</h4><span class="docket-count mono">4</span></div>
+            <div class="docket-list">
+              <div class="task"><div class="task-title">Build initial product shortlist</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-assignee">Raymond</span><span class="task-due overdue mono">due 06-21 ⚠</span></div></div>
+              <div class="task"><div class="task-title">Open business bank account</div><div class="task-meta"><span class="pill pill-crit">urgent</span><span class="task-phase">Wk5 · Finance</span><span class="task-assignee">Arlene</span></div></div>
+              <div class="task"><div class="task-title">Create Shopee/Lazada/TikTok seller account</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-phase">Wk6 · Operations</span><span class="task-assignee">Raymond</span></div></div>
+              <div class="task"><div class="task-title">Add business and bank details to all stores</div><div class="task-meta"><span class="pill pill-crit">urgent</span><span class="task-assignee">Arlene</span><span class="task-due overdue mono">due 08-08 ⚠</span></div></div>
+            </div>
+          </div>
+          <div class="docket-col">
+            <div class="docket-col-head"><h4>On-Hold</h4><span class="docket-count mono">0</span></div>
+            <div class="docket-list"><div class="empty-col">No items</div></div>
+          </div>
+          <div class="docket-col">
+            <div class="docket-col-head"><h4>Review</h4><span class="docket-count mono">1</span></div>
+            <div class="docket-list">
+              <div class="task"><div class="task-title">Obtain Clearances and Permits</div><div class="task-meta"><span class="pill pill-crit">urgent</span><span class="task-assignee">Arlene</span><span class="task-due overdue mono">due 06-21 ⚠</span></div></div>
+            </div>
+          </div>
+          <div class="docket-col">
+            <div class="docket-col-head"><h4>Done</h4><span class="docket-count mono">7</span></div>
+            <div class="docket-list">
+              <div class="task"><div class="task-title">Confirm sole proprietorship structure</div><div class="task-meta"><span class="pill pill-good">urgent</span></div></div>
+              <div class="task"><div class="task-title">Research Alibaba ordering &amp; shipping to PH</div><div class="task-meta"><span class="pill pill-neutral">low</span><span class="task-assignee">Arvin</span></div></div>
+              <div class="task"><div class="task-title">Define roles and responsibilities</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-assignee">Arvin</span></div></div>
+              <div class="task"><div class="task-title">Brainstorm 3–5 brand/company names</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-assignee">Arvin</span></div></div>
+              <div class="task"><div class="task-title">Check name / social / domain availability</div><div class="task-meta"><span class="pill pill-warn">high</span><span class="task-assignee">Arvin</span></div></div>
+              <div class="task"><div class="task-title">Create shared business email</div><div class="task-meta"><span class="pill pill-neutral">medium</span><span class="task-assignee">Arvin</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 2 — WORKFLOW -->
+    <section class="panel" data-panel="2">
+      <div class="panel-inner">
+        <span class="eyebrow">02 · Process</span>
+        <h2>Operational Workflow</h2>
+        <p class="panel-note">The 10-step pipeline every Stock Keeping Unit (SKU) moves through, per the SOP's (Standard Operating Procedure) Daily Operating Procedures (Section 10). Wrapped into two rows so it stays readable. Raymond runs the front half solo, Arlene runs the back half hands-on, Arvin owns Reporting only. Diamonds are approval/decision gates — these stay with Arlene and Arvin regardless of who does the hands-on step. <strong>Click any step for its full procedure — good for walking the team through one at a time.</strong></p>
+
+        <div class="fig-wrap">
+        <figure>
+          <div class="fig-legend">
+            <span><i class="owner-raymond"></i>Raymond owns</span>
+            <span><i class="owner-arlene"></i>Arlene owns</span>
+            <span><i class="owner-arvin"></i>Arvin owns</span>
+            <span><i style="background:var(--warn);border-radius:2px;transform:rotate(45deg);width:7px;height:7px;"></i>decision gate</span>
+          </div>
+          <svg viewBox="0 0 1220 340" role="img" aria-label="Ten step operational pipeline from Sourcing to Reporting, wrapped into two rows. As of 2026-08-22, Raymond owns Sourcing through Selling, Arlene owns Receiving through CX and Returns, Arvin owns Reporting only, with approval gates before Ordering and on the loop back from Reporting to Sourcing">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--text-400)"/></marker>
+              <marker id="arrowLoop" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--warn)"/></marker>
+            </defs>
+            <g>
+              <!-- row 1 — Raymond (cyan) through Ordering, then Arlene (orange) picks up Receiving/Repackaging -->
+              <a href="#wf-sourcing" class="wf-node-link" aria-label="View Sourcing procedure detail">
+                <rect x="20" y="40" width="200" height="70" rx="10" fill="var(--cyan-500)"/>
+                <text x="120" y="72" text-anchor="middle" fill="#fff" font-weight="700" font-size="15">SOURCING</text>
+                <text x="120" y="92" text-anchor="middle" fill="#fff" font-size="11">Raymond</text>
+              </a>
+              <line x1="220" y1="75" x2="256" y2="75" stroke="var(--text-400)" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+              <a href="#wf-sampling" class="wf-node-link" aria-label="View Sampling procedure detail">
+                <rect x="260" y="40" width="200" height="70" rx="10" fill="var(--cyan-500)"/>
+                <text x="360" y="72" text-anchor="middle" fill="#fff" font-weight="700" font-size="15">SAMPLING</text>
+                <text x="360" y="92" text-anchor="middle" fill="#fff" font-size="11">Raymond</text>
+              </a>
+              <line x1="460" y1="75" x2="471" y2="75" stroke="var(--text-400)" stroke-width="1.6"/>
+              <text x="480" y="22" text-anchor="middle" fill="var(--warn)" font-weight="700" font-size="8" letter-spacing="0.04em">GATE</text>
+              <text x="480" y="34" text-anchor="middle" fill="var(--warn)" font-weight="700" font-size="10">Arlene approves</text>
+              <path d="M480,67 L488,75 L480,83 L472,75 Z" fill="var(--warn)" stroke="var(--text-400)" stroke-width="1"/>
+              <line x1="489" y1="75" x2="496" y2="75" stroke="var(--text-400)" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+              <a href="#wf-ordering" class="wf-node-link" aria-label="View Ordering procedure detail">
+                <rect x="500" y="40" width="200" height="70" rx="10" fill="var(--cyan-500)"/>
+                <text x="600" y="72" text-anchor="middle" fill="#fff" font-weight="700" font-size="15">ORDERING</text>
+                <text x="600" y="92" text-anchor="middle" fill="#fff" font-size="11">Raymond</text>
+                <text x="600" y="105" text-anchor="middle" fill="#fff" fill-opacity=".85" font-size="7.5">&gt;₱3,000 → Arlene</text>
+              </a>
+              <line x1="700" y1="75" x2="736" y2="75" stroke="var(--text-400)" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+              <a href="#wf-receiving" class="wf-node-link" aria-label="View Receiving procedure detail">
+                <rect x="740" y="40" width="200" height="70" rx="10" fill="var(--orange)"/>
+                <text x="840" y="72" text-anchor="middle" fill="#fff" font-weight="700" font-size="15">RECEIVING</text>
+                <text x="840" y="92" text-anchor="middle" fill="#fff" font-size="11">Arlene</text>
+              </a>
+              <line x1="940" y1="75" x2="976" y2="75" stroke="var(--text-400)" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+              <a href="#wf-repackaging" class="wf-node-link" aria-label="View Repackaging procedure detail">
+                <rect x="980" y="40" width="200" height="70" rx="10" fill="var(--orange)"/>
+                <text x="1080" y="72" text-anchor="middle" fill="#fff" font-weight="700" font-size="14.5">REPACKAGING</text>
+                <text x="1080" y="92" text-anchor="middle" fill="#fff" font-size="11">Arlene</text>
+              </a>
+
+              <polyline points="1080,110 1080,150 120,150 120,196" fill="none" stroke="var(--text-400)" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+              <!-- row 2 — Raymond (cyan) picks Listing/Selling back up, Arlene (orange) closes Fulfillment/CX, Arvin (outline) closes with Reporting -->
+              <a href="#wf-listing" class="wf-node-link" aria-label="View Listing procedure detail">
+                <rect x="20" y="200" width="200" height="70" rx="10" fill="var(--cyan-500)"/>
+                <text x="120" y="232" text-anchor="middle" fill="#fff" font-weight="700" font-size="15">LISTING</text>
+                <text x="120" y="252" text-anchor="middle" fill="#fff" font-size="11">Raymond</text>
+              </a>
+              <line x1="220" y1="235" x2="256" y2="235" stroke="var(--text-400)" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+              <a href="#wf-selling" class="wf-node-link" aria-label="View Selling procedure detail">
+                <rect x="260" y="200" width="200" height="70" rx="10" fill="var(--cyan-500)"/>
+                <text x="360" y="232" text-anchor="middle" fill="#fff" font-weight="700" font-size="15">SELLING</text>
+                <text x="360" y="252" text-anchor="middle" fill="#fff" font-size="11">Raymond</text>
+              </a>
+              <line x1="460" y1="235" x2="496" y2="235" stroke="var(--text-400)" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+              <a href="#wf-fulfillment" class="wf-node-link" aria-label="View Fulfillment procedure detail">
+                <rect x="500" y="200" width="200" height="70" rx="10" fill="var(--orange)"/>
+                <text x="600" y="232" text-anchor="middle" fill="#fff" font-weight="700" font-size="15">FULFILLMENT</text>
+                <text x="600" y="252" text-anchor="middle" fill="#fff" font-size="11">Arlene</text>
+              </a>
+              <line x1="700" y1="235" x2="736" y2="235" stroke="var(--text-400)" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+              <a href="#wf-cxreturns" class="wf-node-link" aria-label="View CX and Returns procedure detail">
+                <rect x="740" y="200" width="200" height="70" rx="10" fill="var(--orange)"/>
+                <text x="840" y="227" text-anchor="middle" fill="#fff" font-weight="700" font-size="14">CX &amp; RETURNS</text>
+                <text x="840" y="252" text-anchor="middle" fill="#fff" font-size="11">Arlene</text>
+                <text x="840" y="264" text-anchor="middle" fill="#fff" fill-opacity=".85" font-size="7.5">&gt;₱500 → Arvin</text>
+              </a>
+              <line x1="940" y1="235" x2="976" y2="235" stroke="var(--text-400)" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+              <a href="#wf-reporting" class="wf-node-link" aria-label="View Reporting procedure detail">
+                <rect x="980" y="200" width="200" height="70" rx="10" fill="var(--white)" stroke="var(--blue-500)" stroke-width="2.5"/>
+                <text x="1080" y="232" text-anchor="middle" fill="var(--blue-500)" font-weight="700" font-size="15">REPORTING</text>
+                <text x="1080" y="252" text-anchor="middle" fill="var(--blue-500)" font-size="11">Arvin</text>
+              </a>
+
+              <polyline points="1080,270 1080,304 609,304" fill="none" stroke="var(--warn)" stroke-width="1.8" stroke-dasharray="6 4"/>
+              <path d="M600,296 L608,304 L600,312 L592,304 Z" fill="var(--warn)" stroke="var(--text-400)" stroke-width="1"/>
+              <polyline points="591,304 6,304 6,75 20,75" fill="none" stroke="var(--warn)" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#arrowLoop)"/>
+              <text x="600" y="322" text-anchor="middle" fill="var(--warn)" font-size="12" font-weight="700">Day 50-70 gate: reorder / adjust / pivot → back to Sourcing</text>
+            </g>
+          </svg>
+        </figure>
+        </div>
+
+        <!-- WORKFLOW STEP DETAIL POPUPS — sourced from zapee-world-sop.html Section 10 (+ Section 11 for CX) -->
+        <div id="wf-sourcing" class="wf-modal">
+          <div class="wf-modal-card">
+            <a href="#" class="wf-modal-close" aria-label="Close">×</a>
+            <span class="wf-modal-badge raymond">Raymond</span>
+            <h3 class="wf-modal-title">Procedure 01 — Product Sourcing &amp; Supplier Communication</h3>
+            <div class="wf-modal-meta">
+              <div class="wf-modal-meta-item"><div class="k">Trigger</div><div class="v">Low stock alert or new product research</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Frequency</div><div class="v">As needed / monthly review</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Records</div><div class="v">Supplier quotes, screenshots, notes</div></div>
+            </div>
+            <ol class="wf-steps">
+              <li>Identify sourcing need: new product, restock, or better supplier</li>
+              <li>Research suppliers on Lazada, Shopee wholesale, Alibaba, or direct contacts</li>
+              <li>Contact minimum 2–3 suppliers per product for price comparison</li>
+              <li>Request MOQ, unit price, shipping cost, and lead time</li>
+              <li>Save quotes in the Supplier Tracker</li>
+              <li>Propose preferred supplier to Arlene with cost comparison summary</li>
+              <li>Receive Arlene's approval before placing any order</li>
+            </ol>
+            <div class="wf-kpi"><strong>KPI:</strong> 3+ supplier quotes compared per product. Sourcing cost vs. target price within 20%.</div>
+            <div class="wf-escalation"><strong>Escalation:</strong> Supplier fails to deliver twice in a row → raise to Arlene for a replacement decision.</div>
+          </div>
+        </div>
+
+        <div id="wf-sampling" class="wf-modal">
+          <div class="wf-modal-card">
+            <a href="#" class="wf-modal-close" aria-label="Close">×</a>
+            <span class="wf-modal-badge raymond">Raymond</span>
+            <h3 class="wf-modal-title">Procedure 02 — Sampling &amp; Product Approval</h3>
+            <div class="wf-role-note">Steps below still name the pre-2026-08-22 split (Raymond receiving a sample, Arvin reviewing it). Raymond now owns Sampling end-to-end — steps 2–3 haven't been rewritten for that yet.</div>
+            <div class="wf-modal-meta">
+              <div class="wf-modal-meta-item"><div class="k">Trigger</div><div class="v">New product or new supplier</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Frequency</div><div class="v">Before first bulk order</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Records</div><div class="v">Sample photos, quality notes</div></div>
+            </div>
+            <ol class="wf-steps">
+              <li>Order 1–3 sample units before committing to bulk order</li>
+              <li>Raymond receives the sample and checks quality, packaging, and dimensions</li>
+              <li>Arvin reviews sample against listing expectations</li>
+              <li>Document findings: photos + written notes in shared folder</li>
+              <li>Arlene reviews and approves or rejects the sample</li>
+              <li>If approved, proceed to Ordering. If rejected, source an alternative supplier.</li>
+            </ol>
+            <div class="wf-kpi"><strong>KPI:</strong> No bulk orders placed without sample approval.</div>
+          </div>
+        </div>
+
+        <div id="wf-ordering" class="wf-modal">
+          <div class="wf-modal-card">
+            <a href="#" class="wf-modal-close" aria-label="Close">×</a>
+            <span class="wf-modal-badge raymond">Raymond</span>
+            <h3 class="wf-modal-title">Procedure 03 — Ordering &amp; Restocking</h3>
+            <div class="wf-role-note">Step 1 below still says "Raymond reports to Arvin every Monday" — that reporting line no longer applies now that Raymond owns Ordering directly; not yet rewritten.</div>
+            <div class="wf-modal-meta">
+              <div class="wf-modal-meta-item"><div class="k">Trigger</div><div class="v">Stock drops below reorder level</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Frequency</div><div class="v">As needed, min. weekly check</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Records</div><div class="v">Purchase order, payment receipt</div></div>
+            </div>
+            <ol class="wf-steps">
+              <li>Check inventory levels weekly (Raymond reports to Arvin every Monday)</li>
+              <li>Identify items at or below reorder threshold</li>
+              <li>Create purchase order with: supplier, item, qty, unit price, total cost</li>
+              <li>Submit purchase order to Arlene for approval (if above ₱3,000)</li>
+              <li>Process payment after approval — save receipt</li>
+              <li>Notify Raymond of expected delivery date</li>
+              <li>Update inventory tracker with pending order</li>
+            </ol>
+            <div class="wf-kpi"><strong>KPI:</strong> Zero stockouts on top-selling products.</div>
+          </div>
+        </div>
+
+        <div id="wf-receiving" class="wf-modal">
+          <div class="wf-modal-card">
+            <a href="#" class="wf-modal-close" aria-label="Close">×</a>
+            <span class="wf-modal-badge">Arlene</span>
+            <h3 class="wf-modal-title">Procedure 04 — Receiving &amp; Checking Inventory</h3>
+            <div class="wf-role-note">Step 5 below still says "flag discrepancies to Arvin" — he's off the pipeline now, so this should route to Raymond (the sourcing/supplier owner) or stay internal to Arlene; not yet rewritten.</div>
+            <div class="wf-modal-meta">
+              <div class="wf-modal-meta-item"><div class="k">Trigger</div><div class="v">Delivery arrives</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Frequency</div><div class="v">Every delivery</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Records</div><div class="v">Delivery photo, count, damage notes</div></div>
+            </div>
+            <ol class="wf-steps">
+              <li>Receive delivery and count all items against the purchase order</li>
+              <li>Check for damaged, defective, or missing items</li>
+              <li>Photograph delivery: box condition, items spread out with count visible</li>
+              <li>Record received qty in inventory tracker</li>
+              <li>Flag discrepancies or damages to Arvin immediately</li>
+              <li>Store inventory in designated area, organized by product</li>
+              <li>Update stock count in platform listings if needed</li>
+            </ol>
+            <div class="wf-kpi"><strong>KPI:</strong> 100% of deliveries documented with photo + count record.</div>
+            <div class="wf-escalation"><strong>Escalation:</strong> 5%+ of items damaged → Arvin contacts supplier for replacement or credit.</div>
+          </div>
+        </div>
+
+        <div id="wf-repackaging" class="wf-modal">
+          <div class="wf-modal-card">
+            <a href="#" class="wf-modal-close" aria-label="Close">×</a>
+            <span class="wf-modal-badge">Arlene</span>
+            <h3 class="wf-modal-title">Procedure 05 — Repackaging, Labeling &amp; Brand Application</h3>
+            <div class="wf-role-note">Steps 1 and 5 below still name Arvin for packaging instructions/defect review — he's off the pipeline now; not yet rewritten to reflect that this is fully Arlene's domain.</div>
+            <div class="wf-modal-meta">
+              <div class="wf-modal-meta-item"><div class="k">Trigger</div><div class="v">New stock needing repackaging</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Frequency</div><div class="v">Per batch received</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Records</div><div class="v">Packaged qty, defects found</div></div>
+            </div>
+            <ol class="wf-steps">
+              <li>Confirm repackaging instructions from Arvin (sticker placement, bag type, seal method)</li>
+              <li>Prepare packaging materials before starting</li>
+              <li>Repackage items per brand standard — Zapee World branding applied consistently</li>
+              <li>Check each unit: seal, label placement, no defects</li>
+              <li>Set aside defective units for Arvin's review</li>
+              <li>Update packaged-ready count in inventory tracker</li>
+            </ol>
+            <div class="wf-kpi"><strong>KPI:</strong> 0% improperly labeled units shipped to customers.</div>
+          </div>
+        </div>
+
+        <div id="wf-listing" class="wf-modal">
+          <div class="wf-modal-card">
+            <a href="#" class="wf-modal-close" aria-label="Close">×</a>
+            <span class="wf-modal-badge raymond">Raymond</span>
+            <h3 class="wf-modal-title">Procedure 06 — Product Listing Creation</h3>
+            <div class="wf-modal-meta">
+              <div class="wf-modal-meta-item"><div class="k">Trigger</div><div class="v">New product approved for sale</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Frequency</div><div class="v">Per new product</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Records</div><div class="v">Listing URL, photos, launch date</div></div>
+            </div>
+            <ol class="wf-steps">
+              <li>Take or source product photos: minimum 5 photos, white background preferred</li>
+              <li>Write product title with relevant keywords for search</li>
+              <li>Write product description: what it is, benefits, size/dimensions, usage</li>
+              <li>Set price based on cost + target margin (minimum 30% gross margin)</li>
+              <li>Set initial stock quantity accurately</li>
+              <li>Choose correct product category and tags</li>
+              <li>Publish on Shopee first, then Lazada, then TikTok Shop</li>
+              <li>Test listing visibility: search for it by keyword and confirm it appears</li>
+              <li>Log listing URL and launch date in the product tracker</li>
+            </ol>
+            <div class="wf-kpi"><strong>KPI:</strong> Listing goes live within 48 hours of product approval.</div>
+          </div>
+        </div>
+
+        <div id="wf-selling" class="wf-modal">
+          <div class="wf-modal-card">
+            <a href="#" class="wf-modal-close" aria-label="Close">×</a>
+            <span class="wf-modal-badge raymond">Raymond</span>
+            <h3 class="wf-modal-title">Selling — no dedicated SOP written yet</h3>
+            <div class="wf-no-sop">Unlike the other 9 steps, "Selling" doesn't have a numbered procedure in the SOP document — this is synthesized from adjacent sections, not copied from a written procedure. Worth writing a real Procedure 06b if the team needs it spelled out.</div>
+            <ol class="wf-steps">
+              <li>Manage live listing pricing and promotions — Raymond owns the seller accounts and platform strategy under the 2026-08-22 restructure</li>
+              <li>Run and monitor ad campaigns across Shopee, Lazada, and TikTok Ads</li>
+              <li>Respond to buyer inquiries within Section 11's response targets — Shopee/Lazada chat ≤1h, TikTok ≤2h, 8am–8pm operating hours</li>
+              <li>Track the 4-Pillar Sales metrics: conversion rate, Average Order Value (AOV), Return on Ad Spend (ROAS) per platform, Cost Per Acquisition (CPA)</li>
+            </ol>
+            <div class="wf-kpi"><strong>Source:</strong> Team panel role definitions + Customer Service Standards (Section 11.1), not Section 10.</div>
+          </div>
+        </div>
+
+        <div id="wf-fulfillment" class="wf-modal">
+          <div class="wf-modal-card">
+            <a href="#" class="wf-modal-close" aria-label="Close">×</a>
+            <span class="wf-modal-badge">Arlene</span>
+            <h3 class="wf-modal-title">Procedure 07 — Order Processing, Packing &amp; Shipping</h3>
+            <div class="wf-modal-meta">
+              <div class="wf-modal-meta-item"><div class="k">Trigger</div><div class="v">New order on any platform</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Frequency</div><div class="v">Daily / per order</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Records</div><div class="v">Packed photo, tracking number</div></div>
+            </div>
+            <ol class="wf-steps">
+              <li>Check platform dashboard for new orders every morning and afternoon</li>
+              <li>Note order details: item, qty, buyer name, address, platform</li>
+              <li>Pick items from inventory, verify correct product code and quantity</li>
+              <li>Pack item with protective material if needed; apply Zapee World packaging</li>
+              <li>Attach shipping label correctly</li>
+              <li>Take photo of packed parcel before sealing</li>
+              <li>Hand off to courier or drop off at shipping partner</li>
+              <li>Record tracking number, mark "shipped" on platform</li>
+              <li>Update inventory count (deduct shipped qty)</li>
+            </ol>
+            <div class="wf-kpi"><strong>KPI:</strong> Orders packed and handed off within 24 hours of placement.</div>
+          </div>
+        </div>
+
+        <div id="wf-cxreturns" class="wf-modal">
+          <div class="wf-modal-card">
+            <a href="#" class="wf-modal-close" aria-label="Close">×</a>
+            <span class="wf-modal-badge">Arlene (execution) · Arvin (&gt;₱500)</span>
+            <h3 class="wf-modal-title">Procedure 08 — Return &amp; Refund Handling</h3>
+            <div class="wf-role-note">Steps below still say "Raymond" for execution — Arlene owns Returns &amp; CX (Customer Experience) hands-on. Escalation: above ₱500 → Arvin, above ₱2,000 → Arlene.</div>
+            <div class="wf-modal-meta">
+              <div class="wf-modal-meta-item"><div class="k">Trigger</div><div class="v">Return/refund request filed</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Frequency</div><div class="v">As needed</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Records</div><div class="v">Reason, resolution, amount</div></div>
+            </div>
+            <ol class="wf-steps">
+              <li>Acknowledge return/refund request within 24 hours</li>
+              <li>Review reason: wrong item, damaged, defective, or buyer's remorse</li>
+              <li>Defective or wrong item shipped → approve return or replacement immediately</li>
+              <li>Buyer's remorse → follow platform policy, don't exceed platform refund rules</li>
+              <li>Refunds under ₱500: Raymond approves and processes</li>
+              <li>Refunds ₱500+: escalate to Arvin; over ₱2,000 escalate to Arlene</li>
+              <li>Process refund through the platform's return system</li>
+              <li>Document: buyer name, order number, reason, resolution, amount refunded</li>
+              <li>Inspect returned item on receipt; classify resellable, damaged, or dispose</li>
+            </ol>
+            <div class="wf-kpi"><strong>KPI:</strong> All return requests resolved within 3 business days.</div>
+          </div>
+        </div>
+
+        <div id="wf-reporting" class="wf-modal">
+          <div class="wf-modal-card">
+            <a href="#" class="wf-modal-close" aria-label="Close">×</a>
+            <span class="wf-modal-badge arvin">Arvin</span>
+            <h3 class="wf-modal-title">Procedure 09 — Inventory Count &amp; Stock Alerts</h3>
+            <div class="wf-role-note">This procedure was written when Raymond counted stock and Arvin decided reorders. Now Raymond owns Ordering directly and Arvin does analytics, not physical counts — so who actually does the Monday count (Raymond, since he needs the number to reorder himself; or Arlene, since she receives/repackages the physical stock) is an open question worth settling with the team, not guessed here.</div>
+            <div class="wf-modal-meta">
+              <div class="wf-modal-meta-item"><div class="k">Trigger</div><div class="v">Weekly Monday check / stock alert</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Frequency</div><div class="v">Weekly + after bulk receiving</div></div>
+              <div class="wf-modal-meta-item"><div class="k">Records</div><div class="v">Inventory count sheet</div></div>
+            </div>
+            <ol class="wf-steps">
+              <li>Every Monday morning, Raymond physically counts all stock</li>
+              <li>Record count per product code in inventory tracker</li>
+              <li>Flag any item at or below reorder threshold</li>
+              <li>Send stock report to Arvin by Monday noon</li>
+              <li>Arvin reviews and initiates Ordering for any items needing reorder</li>
+              <li>Reconcile physical count vs. platform stock numbers — fix discrepancies</li>
+            </ol>
+            <div class="wf-kpi"><strong>KPI:</strong> Physical count matches platform count within ±2 units per SKU.</div>
+            <div class="wf-escalation"><strong>Also feeds:</strong> the monthly P&amp;L routine (Section 8.4 — Arvin compiles sales/expenses by the 1st, Arlene reviews by the 3rd, distributes by the 5th), which is what the Day 50-70/90 reorder-and-scale gate on this diagram actually runs on.</div>
+          </div>
+        </div>
+
+        <div class="subhead">90-Day Playbook</div>
+        <div class="stepper">
+          <div class="step"><div class="step-days">Days 1–15</div><h4>Compliance &amp; Infrastructure</h4><p>Finalize BIR, open bank account, start seller applications, sign the partnership agreement.</p></div>
+          <div class="step"><div class="step-days">Days 16–30</div><h4>Decide Product, Place Order</h4><p>Finalize test SKUs, place trial order via CargoBoss, build listings, set up bookkeeping.</p></div>
+          <div class="step"><div class="step-days">Days 31–50</div><h4>Launch First Cycle</h4><p>Go live on all three platforms, run capped ad tests, monitor SLA and CS live.</p></div>
+          <div class="step"><div class="step-days">Days 51–70</div><h4>Data &amp; Reorder Decision</h4><p>Compile real margin/CAC/SLA data, decide reorder vs. adjust vs. pivot.</p></div>
+          <div class="step"><div class="step-days">Days 71–90</div><h4>Second Cycle &amp; Scale Call</h4><p>Execute reorder with improvements; evaluate against brand-and-scale signals.</p></div>
+        </div>
+        <div class="override"><strong>Reality check:</strong> Snapshot shows Day-1–15 compliance items (BIR/permits) still open ~61 days past their internal due date, while Week 6 (listings/launch prep) tasks are already queued. Worth resequencing the board so launch-prep doesn't outrun the permits it depends on.</div>
+      </div>
+    </section>
+
+    <!-- PANEL 3 — TEAM -->
+    <section class="panel" data-panel="3">
+      <div class="panel-inner">
+        <span class="eyebrow">03 · People</span>
+        <h2>Team &amp; Decision Rights</h2>
+        <p class="panel-note">A trial-phase structure while the team learns each responsibility on trial products, before scaling up (targeted for 2027). Spending authority scales with domain ownership, not title.</p>
+        <div class="grid-3">
+          <div class="role-card">
+            <div class="role-name">Arlene Zapanta Baluyut</div>
+            <div class="role-title">Sole Proprietor / Owner</div>
+            <ul>
+              <li>Final approval, all financial oversight</li>
+              <li>Department of Trade and Industry (DTI), Bureau of Internal Revenue (BIR), and Local Government Unit (LGU) compliance</li>
+              <li>Bank, e-wallet, and payout ownership</li>
+              <li>Hands-on Receiving, Repackaging, Fulfillment, Shipping, Returns, and Customer Experience (CX), plus finance execution</li>
+              <li>Expenses ₱3,000+ require her approval</li>
+            </ul>
+          </div>
+          <div class="role-card">
+            <div class="role-name">Raymond Zapanta</div>
+            <div class="role-title">Online &amp; Items Specialist</div>
+            <ul>
+              <li>Manages and maintains the Shopee, Lazada, and TikTok Shop seller accounts</li>
+              <li>Owns the front half of the pipeline solo: Sourcing, Sampling, Ordering, Listing, Selling</li>
+              <li>Emergency restocking up to ₱3,000, notify Arlene within 24h</li>
+              <li>Refunds ≤₱500 self-authorize, above → Arvin</li>
+            </ul>
+          </div>
+          <div class="role-card">
+            <div class="role-name">Arvin Zapanta</div>
+            <div class="role-title">Analytics &amp; Tooling Lead</div>
+            <ul>
+              <li>Pulls data from financial reports, inventory, and overhead to analyze whether the business is on track to scale, or a process needs fixing first</li>
+              <li>Builds the company's internal software: inventory tracking (sourcing → receiving → repackaging → selling, including damages/cancellations/returns) and financial/overhead analysis tools</li>
+              <li>Off the day-to-day pipeline entirely — no hands-on step, owns Reporting only</li>
+              <li>Retains refund approval above ₱500</li>
+            </ul>
+          </div>
+        </div>
+        <div class="subhead">Decision Rights</div>
+        <p class="panel-note" style="margin-bottom:10px;">Arlene and Arvin hold the owner-approval sign-off thresholds regardless of who does the hands-on step. Day-to-day operating authority below those gates follows whoever actually runs that domain.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Decision</th><th>Who decides</th><th>Threshold</th></tr></thead>
+            <tbody>
+              <tr><td>Profit split, team changes, registration, bank changes</td><td>Arlene only</td><td>—</td></tr>
+              <tr><td>Expenses</td><td>Arlene only</td><td>₱10,000+</td></tr>
+              <tr><td>New product category, platform fee changes</td><td>Joint discussion, Arlene decides</td><td>₱3,000–10,000</td></tr>
+              <tr><td>Sourcing → Selling domain (accounts, listings)</td><td>Raymond</td><td>&lt;₱1,000 self; ₱1,000–3,000 message-approve to Arlene</td></tr>
+              <tr><td>Receiving → CX domain (packing, returns, finance execution)</td><td>Arlene</td><td>&lt;₱1,000 self; ₱1,000–3,000 message-approve</td></tr>
+              <tr><td>Emergency restocking</td><td>Raymond</td><td>up to ₱3,000, notify Arlene within 24h</td></tr>
+              <tr><td>Emergency refund</td><td>Arlene</td><td>up to ₱500, notify same day; above → Arvin</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 4 — MONEY -->
+    <section class="panel" data-panel="4">
+      <div class="panel-inner">
+        <span class="eyebrow">04 · Finance</span>
+        <h2>Profit Split &amp; Capital</h2>
+        <p class="panel-note">Profit-sharing only, not equity — Arlene remains sole legal/capital owner throughout. Current split is 40/30/30, reflecting the roles below — pending Arlene's signed sign-off per SOP (Standard Operating Procedure) Section 7.</p>
+
+        <div class="kpi-row kpi-row--3">
+          <div class="kpi-tile kpi-tile--arlene"><div class="kpi-label">Arlene</div><div class="kpi-value mono">40%</div><div class="kpi-indicator">Sole Proprietor</div></div>
+          <div class="kpi-tile kpi-tile--raymond"><div class="kpi-label">Raymond</div><div class="kpi-value mono">30%</div><div class="kpi-indicator">Online &amp; Items Specialist</div></div>
+          <div class="kpi-tile kpi-tile--arvin"><div class="kpi-label">Arvin</div><div class="kpi-value mono">30%</div><div class="kpi-indicator">Analytics &amp; Tooling Lead</div></div>
+        </div>
+        <div class="card mt-sm" style="margin-bottom:18px;">
+          <p style="font-size:12.5px;color:var(--text-300);"><strong style="color:var(--text-400);">Why this split:</strong> Arlene keeps the highest share as capital co-principal, sole legal owner, and now the most hands-on labor of the three. Raymond moves up because he now runs the entire front half of the pipeline solo with no capital stake. Arvin stays at 30% — his hands-on pipeline work dropped to zero, but that's offset by capital co-principal status plus building software that becomes an owned business asset.</p>
+        </div>
+
+        <div class="subhead">Profit Waterfall — Gross Revenue to Net Distributable Profit</div>
+        <p class="panel-note" style="margin-bottom:10px;">Structural, not a live figure — see the worked examples below for actual peso amounts. Green rows are new since the restructure; everything else was already in SOP Section 5.1.</p>
+        <div class="waterfall-list">
+          <div class="wf-row wf-row-top"><span>Gross Marketplace Revenue</span></div>
+          <div class="wf-row"><span>− Cost of Goods Sold <em>(COGS)</em></span></div>
+          <div class="wf-row"><span>− Shipping / freight</span></div>
+          <div class="wf-row"><span>− Platform fees &amp; processing</span></div>
+          <div class="wf-row"><span>− Advertising &amp; boosting</span></div>
+          <div class="wf-row"><span>− Taxes &amp; government fees</span></div>
+          <div class="wf-row"><span>− Refunds &amp; returns (net)</span></div>
+          <div class="wf-row"><span>− Packaging materials</span></div>
+          <div class="wf-row wf-row-new"><span>− Direct labor <em>(variable, per-order — new, not material yet)</em></span></div>
+          <div class="wf-row wf-row-new"><span>− Admin/support labor <em>(fixed, e.g. a hired assistant — new, not material yet)</em></span></div>
+          <div class="wf-row"><span>− Software tools &amp; subscriptions</span></div>
+          <div class="wf-row"><span>− Miscellaneous expenses <em>(utilities/phone/internet/transport — see Overhead below)</em></span></div>
+          <div class="wf-row"><span>− Mandatory Reserve <em>(15% or ₱5,000 min)</em></span></div>
+          <div class="wf-row wf-row-new"><span>− Reinvestment set-aside <em>(20% — new, see below)</em></span></div>
+          <div class="wf-row wf-row-total"><span>= Net Distributable Profit</span></div>
+        </div>
+        <div class="split-row">
+          <div class="split-tile" style="background:var(--orange);"><div class="name">Arlene</div><div class="pct">40%</div></div>
+          <div class="split-tile" style="background:var(--cyan-500);"><div class="name">Raymond</div><div class="pct">30%</div></div>
+          <div class="split-tile" style="background:var(--blue-500);"><div class="name">Arvin</div><div class="pct">30%</div></div>
+        </div>
+
+        <div class="subhead">Overhead — What's New</div>
+        <p class="panel-note" style="margin-bottom:10px;">Most of this already had a home in the SOP's existing lines — the real gap was narrower than it looked.</p>
+        <div class="grid-2" style="margin-bottom:6px;">
+          <div class="card">
+            <h3 style="font-size:14px;">Utilities, phone, internet, transportation</h3>
+            <p class="card-lede">Not new top-level deductions — fold into the existing "Miscellaneous expenses" line with explicit rules, since Zapee is home-based with no dedicated leased space yet:</p>
+            <ul class="mini-checklist">
+              <li>Transportation: reimbursed only for supplier visits, bank runs, or DTI/BIR/LGU (Department of Trade and Industry / Bureau of Internal Revenue / Local Government Unit) errands — receipt required</li>
+              <li>Phone/internet: a flat 30–40% partial allocation per person, since these lines carry both personal and seller-app/CX use — not the full bill</li>
+              <li>Utilities: not material yet — revisit only once Zapee has a dedicated packing space with its own meter</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 style="font-size:14px;">Labor, if hiring outside the three of you</h3>
+            <p class="card-lede">This is the one genuinely new gap — nothing in the current formula accounts for paying a non-principal. Two sub-types, since they behave differently:</p>
+            <ul class="mini-checklist">
+              <li><strong>Direct labor</strong> (e.g., a packer paid per parcel) — variable, scales with order volume</li>
+              <li><strong>Admin/support labor</strong> (e.g., a virtual assistant on monthly retainer) — fixed, same every month regardless of sales</li>
+            </ul>
+            <p class="card-lede" style="margin-top:6px;">Not material today, but worth watching — Raymond solo-running Sourcing through Selling is a lot for one person.</p>
+          </div>
+        </div>
+
+        <div class="subhead">Reinvestment Strategy</div>
+        <div class="callout info">
+          <div class="callout-title">Recommended: 20% of net profit, separate from the Reserve</div>
+          <p>The existing 15%/₱5,000-minimum Reserve (SOP Section 6.1–6.2) is sized purely for downside protection — fee spikes, urgent restocking, emergency refunds. It was never meant to fund growth. Section 6.3 already lists six reinvestment priorities (restocking, ads, packaging/branding, software, product expansion, emergency buffer) but never actually funds them — right now they'd compete with the emergency reserve for money, which is the wrong pool.</p>
+          <p><strong>General small-business benchmark, not Zapee-specific data</strong> (there's no live revenue yet to calibrate against): a commonly cited range for an early-stage, inventory-heavy e-commerce seller is 20–30% of net profit reinvested during active growth. Given Zapee is still pre-launch, the conservative end — <strong>20%</strong> — is the sensible starting point, revisited once real Day 50-70 data exists.</p>
+        </div>
+        <div class="table-wrap" style="margin-top:10px;">
+          <table>
+            <thead><tr><th>Step (illustrative — building toward the ₱30,000 reserve target)</th><th>₱50,000 net profit</th><th>₱100,000 net profit</th></tr></thead>
+            <tbody>
+              <tr><td>Net profit before reserve</td><td class="mono">₱50,000</td><td class="mono">₱100,000</td></tr>
+              <tr><td>− Reserve (15% + 5% target-building = 20%)</td><td class="mono">−₱10,000</td><td class="mono">−₱20,000</td></tr>
+              <tr><td>− Reinvestment set-aside (20%, ₱3,000 floor)</td><td class="mono">−₱10,000</td><td class="mono">−₱20,000</td></tr>
+              <tr><td><strong>= Net Distributable Profit</strong></td><td class="mono"><strong>₱30,000</strong></td><td class="mono"><strong>₱60,000</strong></td></tr>
+              <tr><td>Arlene (40%) / Raymond (30%) / Arvin (30%)</td><td class="mono">₱12,000 / ₱9,000 / ₱9,000</td><td class="mono">₱24,000 / ₱18,000 / ₱18,000</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="panel-note mt-sm">Once the ₱30,000 reserve target is met, the Reserve drops back to a flat 15%, leaving more for reinvestment and distribution at the same revenue level.</p>
+
+        <div class="subhead">Salary vs. 40/30/30 Split</div>
+        <div class="callout info">
+          <div class="callout-title">Opt-in salary alternative (SOP 5.5–5.6) — already exists, individual, per quarter</div>
+          <p>Arvin or Raymond may each individually elect a fixed monthly salary instead of their profit share for a given quarter. Arlene's 40% is not eligible — she's the capital/legal owner, not an opt-in labor partner. This isn't a new mechanism; the real question is just whether opting in makes sense right now given the numbers.</p>
+          <p class="mono">Existing reference ranges: Arvin ₱25,000–35,000/mo · Raymond ₱12,000–18,000/mo.</p>
+        </div>
+        <p class="panel-note" style="margin:12px 0 8px;"><strong>Direct answer:</strong> overhead shrinks the size of Net Distributable Profit — it doesn't change the 40/30/30 ratio. So overhead by itself isn't a reason to prefer salary; it only matters if the shrunk pool now regularly pays a person less than their fixed-wage alternative. That's what break-even below tests.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Person</th><th>New share</th><th>Reference salary</th><th>Break-even Net Distributable Profit</th><th>Reading</th></tr></thead>
+            <tbody>
+              <tr><td>Arvin</td><td class="mono">30% (unchanged)</td><td class="mono">₱25k–35k</td><td class="mono"><span class="break-even-good">₱83k–117k/mo</span></td><td>Range still correctly calibrated — his share didn't move.</td></tr>
+              <tr><td>Raymond</td><td class="mono">30% (was 20%)</td><td class="mono">₱12k–18k</td><td class="mono"><span class="break-even-warn">₱40k–60k/mo</span> <span style="color:var(--text-300);">(was ₱60k–90k at 20%)</span></td><td>Reference range is now stale — his share jumped 50% relatively but the salary anchor didn't move. Flag for a Section 5.6 review.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="override mt-sm"><strong>Reading it as guidance, not a rule:</strong> below roughly ₱40k–60k monthly Net Distributable Profit — realistic for a while yet, pre-launch — salary opt-in likely gives both Arvin and Raymond more predictable, arguably larger take-home than their percentage share. Once profit consistently clears ₱80k–100k+, the percentage share clearly wins. <strong>Action item independent of the choice itself:</strong> Raymond's ₱12–18k range should go through the existing Section 5.6 quarterly review now, since his share change is exactly the "business growth" trigger that section already names.</div>
+
+        <div class="subhead">₱1,000,000 Capital Allocation — Provisional</div>
+        <div class="alloc-bar">
+          <div class="alloc-seg--inventory" style="width:27.5%;"></div>
+          <div class="alloc-seg--ads" style="width:27.5%;"></div>
+          <div class="alloc-seg--ops" style="width:17.5%;"></div>
+          <div class="alloc-seg--reserve" style="width:22.5%;"></div>
+          <div class="alloc-seg--buffer" style="width:5%;"></div>
+        </div>
+        <div class="alloc-legend">
+          <div class="alloc-item"><i class="swatch--inventory"></i><div><span class="a-name">Initial test inventory</span><span class="a-range mono">₱250k–300k · 27.5%</span></div></div>
+          <div class="alloc-item"><i class="swatch--ads"></i><div><span class="a-name">Ad spend / traffic testing</span><span class="a-range mono">₱250k–300k · 27.5%</span></div></div>
+          <div class="alloc-item"><i class="swatch--ops"></i><div><span class="a-name">Ops / tooling / compliance</span><span class="a-range mono">₱150k–200k · 17.5%</span></div></div>
+          <div class="alloc-item"><i class="swatch--reserve"></i><div><span class="a-name">Cash reserve (untouched)</span><span class="a-range mono">₱200k–250k · 22.5%</span></div></div>
+          <div class="alloc-item"><i class="swatch--buffer"></i><div><span class="a-name">Unallocated buffer</span><span class="a-range mono">~₱50k · 5%</span></div></div>
+        </div>
+        <p class="panel-note mt-sm">Adopted as a provisional draft. A dedicated allocation tool is deferred until it has a real home in a future dashboard-of-apps.</p>
+      </div>
+    </section>
+
+    <!-- PANEL 5 — COMPLIANCE -->
+    <section class="panel" data-panel="5">
+      <div class="panel-inner">
+        <span class="eyebrow">05 · Legal</span>
+        <h2>Compliance Tracker</h2>
+        <p class="panel-note">TikTok Shop gates full seller-account activation on BIR/DTI proof — "set up seller accounts" and "finalize BIR" are not independent tasks.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Item</th><th>Status</th><th>Renewal</th><th>Responsible</th></tr></thead>
+            <tbody>
+              <tr><td>DTI — Business Name Registration</td><td><span class="pill pill-good">Filed</span></td><td>Check validity date</td><td>Arlene</td></tr>
+              <tr><td>BIR Registration / TIN</td><td><span class="pill pill-warn">Pending</span></td><td>Annual</td><td>Arlene</td></tr>
+              <tr><td>LGU / Mayor's Permit</td><td><span class="pill pill-warn">Pending</span></td><td>Annual (Jan)</td><td>Arlene</td></tr>
+              <tr><td>Barangay Business Clearance</td><td><span class="pill pill-warn">Pending</span></td><td>Annual</td><td>Arlene</td></tr>
+              <tr><td>Shopee Seller Verification</td><td><span class="pill pill-warn">Active per SOP / In Progress per board</span></td><td>Per platform policy</td><td>Arvin</td></tr>
+              <tr><td>Lazada Seller Verification</td><td><span class="pill pill-warn">Active per SOP / In Progress per board</span></td><td>Per platform policy</td><td>Arvin</td></tr>
+              <tr><td>TikTok Shop Seller Account</td><td><span class="pill pill-warn">Active per SOP / In Progress per board</span></td><td>Per platform policy</td><td>Arvin</td></tr>
+              <tr><td>FDA / Product Compliance</td><td><span class="pill pill-neutral">Review needed</span></td><td>Per product category</td><td>Arvin + Arlene</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 6 — CONTENT -->
+    <section class="panel" data-panel="6">
+      <div class="panel-inner">
+        <span class="eyebrow">06 · Brand</span>
+        <h2>Content Engine &amp; Personal Brand</h2>
+        <p class="panel-note">Where the confirmed strategy deviates from the source Playbook's own recommendation, the tradeoff is shown, not hidden.</p>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>Brand Architecture</h3>
+            <p class="card-lede"><strong>Decision:</strong> separate accounts per topic (finance / AI tools / vlog / blog).</p>
+            <div class="override">Overrides the Playbook's single-unified-brand recommendation. Tradeoff accepted: per-topic algorithmic reach vs. running four accounts.</div>
+          </div>
+          <div class="card">
+            <h3>AI Avatar / Digital Twin</h3>
+            <p class="card-lede"><strong>Decision:</strong> default production method.</p>
+            <div class="override">Overrides the authenticity-first (reserved-only) recommendation. TikTok still requires a visible AI-content label on any avatar video regardless.</div>
+          </div>
+        </div>
+
+        <div class="subhead">Weekly Cadence</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Day</th><th>Output</th><th>Source</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">Mon</td><td>1 carousel (finance/AI, Canva)</td><td>Repurposed from prior week's research</td></tr>
+              <tr><td class="mono">Tue</td><td>1 short video (vlog / AI how-to)</td><td>New raw footage</td></tr>
+              <tr><td class="mono">Wed</td><td>1 quote / lesson carousel</td><td>Sourced &amp; verified</td></tr>
+              <tr><td class="mono">Thu</td><td>1 blog post (long-form)</td><td>Original research — next week's source</td></tr>
+              <tr><td class="mono">Fri</td><td>1 short video (finance/product-adjacent)</td><td>Repurposed from Thursday's blog</td></tr>
+              <tr><td class="mono">Wknd</td><td>Light posting / reshare</td><td>No new production</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subhead">Tool Stack</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Category</th><th>Tool</th><th>Price</th><th>Note</th></tr></thead>
+            <tbody>
+              <tr><td>Video enhancement</td><td>YouCam / Pollo AI</td><td>Free + paid</td><td>Language-agnostic</td></tr>
+              <tr><td>Voice cloning</td><td>ElevenLabs</td><td>Free–$22/mo</td><td>Confirmed Filipino/Tagalog</td></tr>
+              <tr><td>Auto-editing</td><td>CapCut</td><td>Free (generous)</td><td>PH-standard</td></tr>
+              <tr><td>Carousels</td><td>Canva</td><td>Free tier sufficient</td><td>Up to 10 slides</td></tr>
+              <tr><td>Custom illustration</td><td>Nano Banana (Gemini)</td><td>Free</td><td>Character-consistent art</td></tr>
+              <tr><td>AI Digital Twin</td><td>HeyGen / BIGVU / Synthesia</td><td>$0–80/mo</td><td>Default — must carry TikTok AI label</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="override mt-lg"><strong>Freight override:</strong> sea freight chosen for the first test batch, overriding the Handbook's air-freight-first recommendation. Tradeoff: cheaper per unit, but slower and has a minimum volume threshold.</div>
+      </div>
+    </section>
+
+    <!-- PANEL 7 — DOCS -->
+    <section class="panel" data-panel="7">
+      <div class="panel-inner">
+        <span class="eyebrow">07 · Reference</span>
+        <h2>Documents &amp; Playbooks</h2>
+        <p class="panel-note">Platform how-tos, the CargoBoss setup gap, the weekly operating rhythm, and the SOP's Appendix A–J — for walking the team through operations, not just reading about them.</p>
+
+        <div class="toc-card">
+          <h4>On this page</h4>
+          <div class="toc-grid">
+            <a href="#doc-glossary">Acronym Glossary</a>
+            <a href="#doc-shopee">Shopee Playbook</a>
+            <a href="#doc-lazada">Lazada Playbook</a>
+            <a href="#doc-tiktok">TikTok Shop Playbook</a>
+            <a href="#doc-cargoboss">CargoBoss — Setup &amp; Management</a>
+            <a href="#doc-tools">Operational Tools</a>
+            <a href="#doc-weekly">Weekly Operating Rhythm</a>
+            <a href="#doc-packaging">Packaging Production Line</a>
+            <a href="#doc-appendices">Appendices (SOP A–J)</a>
+          </div>
+        </div>
+
+        <div id="doc-glossary" class="doc-anchor"></div>
+        <div class="subhead">Acronym Glossary</div>
+        <p class="panel-note" style="margin-bottom:14px;">Every acronym used anywhere on this dashboard, alphabetical. Spelled out on first use in context too — this is the lookup table for whenever that's not enough.</p>
+        <div class="table-wrap" style="margin-bottom:24px;">
+          <table>
+            <thead><tr><th>Acronym</th><th>Full term</th><th>Where it shows up</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">AI</td><td>Artificial Intelligence</td><td>Content tab — AI Avatar/Digital Twin, AI-content label</td></tr>
+              <tr><td class="mono">AM / PM</td><td>Ante Meridiem / Post Meridiem — before noon / after noon</td><td>Weekly Operating Rhythm, Playbook timing</td></tr>
+              <tr><td class="mono">AOV</td><td>Average Order Value</td><td>Selling procedure, 4-Pillar Sales metrics</td></tr>
+              <tr><td class="mono">AWB</td><td>Air Waybill — the shipping document/tracking number for a parcel</td><td>Lazada Playbook</td></tr>
+              <tr><td class="mono">BIR</td><td>Bureau of Internal Revenue (Philippines)</td><td>Team tab, Compliance tab, CargoBoss checklist</td></tr>
+              <tr><td class="mono">CAC</td><td>Customer Acquisition Cost</td><td>90-Day Playbook, Day 51-70 review</td></tr>
+              <tr><td class="mono">CPA</td><td>Cost Per Acquisition</td><td>Selling procedure, 4-Pillar Sales metrics</td></tr>
+              <tr><td class="mono">COGS</td><td>Cost of Goods Sold</td><td>Money tab waterfall</td></tr>
+              <tr><td class="mono">CS</td><td>Customer Service</td><td>Weekly Operating Rhythm, response-time targets</td></tr>
+              <tr><td class="mono">CX</td><td>Customer Experience</td><td>Workflow tab — "CX &amp; Returns" step</td></tr>
+              <tr><td class="mono">DM</td><td>Direct Message</td><td>Customer Service Script Guide (Appendix H)</td></tr>
+              <tr><td class="mono">DTI</td><td>Department of Trade and Industry (Philippines)</td><td>Team tab, Compliance tab</td></tr>
+              <tr><td class="mono">ETA</td><td>Estimated Time of Arrival</td><td>CargoBoss checklist</td></tr>
+              <tr><td class="mono">FDA</td><td>Food and Drug Administration (Philippines)</td><td>Compliance tab</td></tr>
+              <tr><td class="mono">HS code</td><td>Harmonized System code — the international customs classification number for a product</td><td>CargoBoss checklist</td></tr>
+              <tr><td class="mono">KPI</td><td>Key Performance Indicator</td><td>Every workflow procedure popup</td></tr>
+              <tr><td class="mono">LGU</td><td>Local Government Unit (Philippines)</td><td>Team tab, Compliance tab</td></tr>
+              <tr><td class="mono">MOQ</td><td>Minimum Order Quantity</td><td>Sourcing procedure</td></tr>
+              <tr><td class="mono">OTP</td><td>One-Time Password</td><td>Appendix G reference (not reproduced, security)</td></tr>
+              <tr><td class="mono">PH</td><td>Philippines</td><td>Platform Playbooks, general shorthand</td></tr>
+              <tr><td class="mono">ROAS</td><td>Return on Ad Spend</td><td>Selling procedure, 4-Pillar Sales metrics</td></tr>
+              <tr><td class="mono">SKU</td><td>Stock Keeping Unit — one distinct trackable product/variant</td><td>Workflow tab, Roles</td></tr>
+              <tr><td class="mono">SLA</td><td>Service Level Agreement — the promised turnaround/performance standard</td><td>90-Day Playbook</td></tr>
+              <tr><td class="mono">SOP</td><td>Standard Operating Procedure</td><td>Everywhere — the source document this whole dashboard is built from</td></tr>
+              <tr><td class="mono">TIN</td><td>Tax Identification Number</td><td>Compliance tab</td></tr>
+              <tr><td class="mono">URL</td><td>Uniform Resource Locator — a web address</td><td>Platform Playbooks, Source Documents</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="doc-shopee" class="doc-anchor"></div>
+        <div class="subhead">Platform Playbooks</div>
+        <p class="panel-note" style="margin-bottom:14px;">Seller Center URLs are sourced from the SOP's Appendix G. Section layout below is general seller-center orientation, not Zapee-specific documentation — capture real screenshots here once the team is working in these dashboards daily.</p>
+        <div class="grid-3">
+          <div class="platform-card">
+            <h3>Shopee</h3>
+            <div class="platform-url">seller.shopee.ph</div>
+            <div class="subhead">Core sections</div>
+            <ul>
+              <li>Orders — To Ship / Shipped / Completed / Cancelled</li>
+              <li>Chat — buyer messages, ≤1h response target</li>
+              <li>My Products — listing manager</li>
+              <li>Marketing Centre — vouchers, flash sales, ads</li>
+              <li>Finance — Shopee Wallet, payout schedule</li>
+              <li>Shop Performance — ratings, response rate/time</li>
+            </ul>
+            <div class="subhead">Zapee tie-in</div>
+            <ul>
+              <li>Published <strong>first</strong> in the Shopee → Lazada → TikTok listing order (Procedure 06)</li>
+              <li>Fulfillment (Procedure 07): check Orders AM and PM daily</li>
+            </ul>
+          </div>
+          <div id="doc-lazada" class="doc-anchor"></div>
+          <div class="platform-card">
+            <h3>Lazada</h3>
+            <div class="platform-url">sellercenter.lazada.com.ph</div>
+            <div class="subhead">Core sections</div>
+            <ul>
+              <li>Orders — manage, print AWB, arrange shipment</li>
+              <li>Message Centre — buyer chat</li>
+              <li>Products — listing manager</li>
+              <li>Marketing — LazAds, vouchers, campaigns</li>
+              <li>Wallet — finance/payout</li>
+              <li>Growth / Business Advisor — performance insights</li>
+            </ul>
+            <div class="subhead">Zapee tie-in</div>
+            <ul>
+              <li>Published <strong>second</strong>, after Shopee is live</li>
+              <li>Fulfillment and CX &amp; Returns follow the same Procedure 07/08 flow as Shopee</li>
+            </ul>
+          </div>
+          <div id="doc-tiktok" class="doc-anchor"></div>
+          <div class="platform-card">
+            <h3>TikTok Shop</h3>
+            <div class="platform-url">seller.tiktok.com <span style="color:var(--text-300);font-style:italic;">(as documented in the SOP — confirm the exact PH regional URL at signup)</span></div>
+            <div class="subhead">Core sections</div>
+            <ul>
+              <li>Orders — fulfillment queue</li>
+              <li>Shop — product listing manager</li>
+              <li>Live/Video — content tools (organic + livestream)</li>
+              <li>Ads Manager — TikTok Shop Ads</li>
+              <li>Balance — finance/payout</li>
+              <li>Affiliate — creator marketplace</li>
+            </ul>
+            <div class="subhead">Zapee tie-in</div>
+            <ul>
+              <li>Published <strong>third</strong>, last in the listing order</li>
+              <li>Overlaps the Content tab's cadence — any AI-avatar video here needs the visible AI-content label regardless of production method</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="doc-cargoboss" class="doc-anchor"></div>
+        <div class="subhead">CargoBoss — Setup &amp; Management</div>
+        <div class="callout crit">
+          <div class="callout-title">⚠ No internal documentation exists for this yet</div>
+          <p>Searched the SOP, the Handbook, and the rest of the vault — CargoBoss appears only as a board task ("Import and logistics (CargoBoss)," still To Do, Raymond). Nothing below is Zapee-specific; it's the general checklist any China→PH freight-forwarder setup needs, so the task doesn't start from zero. Replace this section with the real steps once the account exists.</p>
+        </div>
+        <div class="card">
+          <ul class="mini-checklist">
+            <li>Create the CargoBoss account and confirm which service tier matches sea freight (the Handbook's chosen method for the first test batch, overriding air-freight-first)</li>
+            <li>Get commercial invoice + packing list templates confirmed with the supplier for every shipment</li>
+            <li>Confirm HS code classification per product — ties directly to the Compliance tab's "FDA / Product Compliance — Review needed" row</li>
+            <li>Confirm minimum volume threshold for sea freight and how it affects order timing</li>
+            <li>Set up shipment tracking/ETA visibility — who checks it, how often</li>
+            <li>Confirm payment terms and who's authorized to pay (ties to the Money tab's spend thresholds)</li>
+            <li>Document the actual step-by-step once the first shipment goes through — this becomes Procedure 01b in a future SOP revision</li>
+          </ul>
+        </div>
+
+        <div id="doc-tools" class="doc-anchor"></div>
+        <div class="subhead">Operational Tools</div>
+        <p class="panel-note" style="margin-bottom:14px;">Distinct from the Content tab's Tool Stack (that's content-creation tools) — this is operations and finance tooling.</p>
+        <div class="table-wrap" style="margin-bottom:14px;">
+          <table>
+            <thead><tr><th>Category</th><th>Tool</th><th>Status / note</th></tr></thead>
+            <tbody>
+              <tr><td>Inventory tracking</td><td>Custom-built by Arvin</td><td>In progress — sourcing → receiving → repackaging → selling, including damages/cancellations/returns. Don't adopt a competing off-the-shelf tool while this is being built.</td></tr>
+              <tr><td>Bookkeeping</td><td>Spreadsheet (now) → Wave or similar (later)</td><td>A spreadsheet is enough at trial-batch volume. Revisit a dedicated bookkeeping tool once order volume makes manual entry the bottleneck.</td></tr>
+              <tr><td>Business analytics / overhead reporting</td><td>Custom-built by Arvin</td><td>In progress — the financial/overhead analysis tool from his new role. This Command Deck is the front-end view; his tool is the engine behind it.</td></tr>
+              <tr><td>Task &amp; project tracking</td><td>Kanban Business Hub (existing)</td><td>Already built and in use — the live task board this dashboard's Snapshot tab pulls from. Don't rebuild this.</td></tr>
+              <tr><td>Team communication</td><td>Whatever the three of you already use daily</td><td>Not a gap worth solving with a new tool — the SOP already requires message-based approvals to be documented, which any chat app satisfies.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="doc-weekly" class="doc-anchor"></div>
+        <div class="subhead">Weekly Operating Rhythm</div>
+        <p class="panel-note" style="margin-bottom:14px;">Sourced from SOP Procedures 09, 03, 07, and Section 11.1 — this is the operations cadence, separate from the personal-brand content calendar on the Content tab. <strong>Who does the Monday count is now an open question</strong> (see the Reporting step's popup on the Workflow tab) — shown below with the historical Raymond/Arvin split, flagged rather than guessed.</p>
+        <div class="stepper">
+          <div class="step"><div class="step-days">Mon · AM</div><h4>Physical stock count</h4><p>Historically Raymond — now open, since he owns Ordering directly and Arvin does analytics, not physical counts.</p></div>
+          <div class="step"><div class="step-days">Mon · Noon</div><h4>Stock report</h4><p>Flag anything at or below reorder threshold; reconcile physical vs. platform counts. Goes to whoever counts, above.</p></div>
+          <div class="step"><div class="step-days">Mon · PM</div><h4>Reorder review</h4><p>Raymond decides directly (he owns Ordering); Arlene approves above ₱3,000.</p></div>
+          <div class="step"><div class="step-days">Daily · AM+PM</div><h4>Order dashboard check</h4><p>Now Arlene's domain — she checks all three platforms; packs and hands off within 24h (Procedure 07).</p></div>
+          <div class="step"><div class="step-days">Daily</div><h4>Customer Service (CS) response windows</h4><p>Shopee/Lazada ≤1h, TikTok ≤2h, returns ≤24h, disputes ≤4h (Section 11.1). Now Arlene's domain.</p></div>
+        </div>
+
+        <div id="doc-packaging" class="doc-anchor"></div>
+        <div class="subhead">Packaging Production Line</div>
+        <p class="panel-note" style="margin-bottom:14px;">Procedure 05 (Repackaging, Labeling &amp; Brand Application) drawn as a physical station line, not a bulleted list — good for walking Arlene or a future hire through the actual bench flow. Same beige/orange visual system as the Workflow tab.</p>
+        <div class="fig-wrap">
+        <figure>
+          <div class="fig-legend">
+            <span><i style="background:var(--orange);"></i>Arlene — main line</span>
+            <span><i style="background:var(--warn);border-radius:2px;transform:rotate(45deg);width:7px;height:7px;"></i>defect branch</span>
+          </div>
+          <svg viewBox="0 0 1220 260" role="img" aria-label="Packaging production line: confirm standard, prepare materials, repackage, check each unit, update count, with a defect branch from the check station to Arvin's inventory tool">
+            <defs>
+              <marker id="arrowPk" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--text-400)"/></marker>
+              <marker id="arrowPkWarn" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--warn)"/></marker>
+            </defs>
+            <g>
+              <rect x="20" y="40" width="200" height="70" rx="10" fill="var(--orange)"/>
+              <text x="120" y="68" text-anchor="middle" fill="#fff" font-weight="700" font-size="13">1 · CONFIRM</text>
+              <text x="120" y="86" text-anchor="middle" fill="#fff" font-size="10">Sticker placement, bag type, seal method</text>
+              <line x1="220" y1="75" x2="256" y2="75" stroke="var(--text-400)" stroke-width="1.6" marker-end="url(#arrowPk)"/>
+
+              <rect x="260" y="40" width="200" height="70" rx="10" fill="var(--orange)"/>
+              <text x="360" y="68" text-anchor="middle" fill="#fff" font-weight="700" font-size="13">2 · PREPARE</text>
+              <text x="360" y="86" text-anchor="middle" fill="#fff" font-size="10">Materials staged before starting</text>
+              <line x1="460" y1="75" x2="496" y2="75" stroke="var(--text-400)" stroke-width="1.6" marker-end="url(#arrowPk)"/>
+
+              <rect x="500" y="40" width="200" height="70" rx="10" fill="var(--orange)"/>
+              <text x="600" y="68" text-anchor="middle" fill="#fff" font-weight="700" font-size="13">3 · REPACKAGE</text>
+              <text x="600" y="86" text-anchor="middle" fill="#fff" font-size="10">Zapee World branding applied consistently</text>
+              <line x1="700" y1="75" x2="736" y2="75" stroke="var(--text-400)" stroke-width="1.6" marker-end="url(#arrowPk)"/>
+
+              <rect x="740" y="40" width="200" height="70" rx="10" fill="var(--orange)"/>
+              <text x="840" y="68" text-anchor="middle" fill="#fff" font-weight="700" font-size="13">4 · CHECK UNIT</text>
+              <text x="840" y="86" text-anchor="middle" fill="#fff" font-size="10">Seal, label, no defects</text>
+              <line x1="940" y1="75" x2="976" y2="75" stroke="var(--text-400)" stroke-width="1.6" marker-end="url(#arrowPk)"/>
+
+              <rect x="980" y="40" width="200" height="70" rx="10" fill="var(--orange)"/>
+              <text x="1080" y="68" text-anchor="middle" fill="#fff" font-weight="700" font-size="13">5 · UPDATE COUNT</text>
+              <text x="1080" y="86" text-anchor="middle" fill="#fff" font-size="10">Packaged-ready count in tracker</text>
+
+              <line x1="840" y1="110" x2="840" y2="166" stroke="var(--warn)" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowPkWarn)"/>
+              <rect x="720" y="170" width="240" height="56" rx="10" fill="var(--warn-tint)" stroke="var(--warn)" stroke-width="1.5"/>
+              <text x="840" y="192" text-anchor="middle" fill="var(--warn)" font-weight="700" font-size="12">FAILS CHECK</text>
+              <text x="840" y="208" text-anchor="middle" fill="var(--warn)" font-size="9.5">Set aside — logged in Arvin's</text>
+              <text x="840" y="219" text-anchor="middle" fill="var(--warn)" font-size="9.5">inventory tool (damages/returns)</text>
+            </g>
+          </svg>
+          <figcaption>Source: SOP Procedure 05. The defect branch destination (Arvin's inventory tool) reflects his new tool-building role, not a rewritten SOP line.</figcaption>
+        </figure>
+        </div>
+
+        <div id="doc-appendices" class="doc-anchor"></div>
+        <div class="subhead">Appendices — SOP Appendix A–J</div>
+        <p class="panel-note" style="margin-bottom:14px;">The SOP's own appendix set. Blank fill-in templates (B, C, D, E) are described, not reproduced — they add nothing to a live dashboard empty. Appendices A, F, and G duplicate what's already live elsewhere in this dashboard, so they point there instead of repeating it.</p>
+        <div class="grid-2" style="margin-bottom:14px;">
+          <div class="appendix-card"><div class="a-code">Appendix A</div><h4>Detailed Role Descriptions</h4><p>Duplicates the Team tab's role cards and decision rights — see there instead.</p></div>
+          <div class="appendix-card"><div class="a-code">Appendix B</div><h4>Monthly Profit Calculation Template</h4><p>Blank fill-in: gross revenue per platform → deductions → net distributable profit → 3-way split. Filled monthly per the Money tab's waterfall.</p></div>
+          <div class="appendix-card"><div class="a-code">Appendix C</div><h4>Monthly Operations Report Template</h4><p>Blank fill-in: orders processed, on-time rate, returns, CS response time, top SKUs, stockouts, supplier issues, next-month priorities.</p></div>
+          <div class="appendix-card"><div class="a-code">Appendix D</div><h4>6-Month Performance Review Template</h4><p>Blank scorecard: same 5 criteria as the Handbook's 100-point review, filled per person every 6 months, feeds any profit-split change.</p></div>
+          <div class="appendix-card"><div class="a-code">Appendix E</div><h4>Inventory Audit Sheet</h4><p>Blank fill-in: expected vs. physical vs. platform count per SKU, ±2 unit target, filled per Monday count.</p></div>
+          <div class="appendix-card"><div class="a-code">Appendix F</div><h4>Expense Approval Matrix</h4><p>Duplicates the Team tab's Decision Rights table — see there instead.</p></div>
+          <div class="appendix-card"><div class="a-code">Appendix G</div><h4>Account Access Inventory</h4><p>Platform URLs already surfaced above in Platform Playbooks. Login/OTP detail intentionally not reproduced here — lives in the shared password manager only.</p></div>
+          <div class="appendix-card"><div class="a-code">Appendix I</div><h4>Supplier Scorecard — methodology</h4><p>Score Price/Quality/Lead Time/Communication/Reliability 1–5 each, total /25. <strong>20+ preferred · 12–19 under review · below 12 replace.</strong></p></div>
+        </div>
+
+        <div class="subhead">Appendix H — Customer Service Script Guide</div>
+        <div class="table-wrap" style="margin-bottom:18px;">
+          <table class="script-table">
+            <thead><tr><th>Situation</th><th>Suggested response (Taglish)</th></tr></thead>
+            <tbody>
+              <tr><td>General inquiry</td><td>"Hi po! Thank you sa inyong mensahe. Tutulungan namin kayo, anong concern po natin?"</td></tr>
+              <tr><td>Order not received</td><td>"Hi po! Pasensya na sa inconvenience. Eto po ang tracking number: [#]. Pwede po ninyong i-track sa [courier]."</td></tr>
+              <tr><td>Wrong item received</td><td>"Hi po! Humihingi kami ng paumanhin. Mag-file po kayo ng return/refund request at ipadala ang photos ng natanggap na item."</td></tr>
+              <tr><td>Refund request</td><td>"Hi po! Natanggap namin ang inyong request. Irerereview namin ito, update sa loob ng 24 hours."</td></tr>
+              <tr><td>Negative review</td><td>"Thank you po sa feedback. Humihingi kami ng paumanhin — pwede ba kayong mag-DM para maayos namin ito?"</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subhead">Appendix J — Order Packaging Checklist</div>
+        <div class="card">
+          <ul class="mini-checklist">
+            <li>Correct item picked (matches order product code)</li>
+            <li>Correct quantity confirmed</li>
+            <li>Item inspected — no defects, damage, or missing parts</li>
+            <li>Zapee World branding / label applied correctly</li>
+            <li>Item protected (bubble wrap, filler if fragile)</li>
+            <li>Outer packaging sealed properly — no gaps or loose seals</li>
+            <li>Shipping label printed and attached correctly</li>
+            <li>Customer name and address readable on label</li>
+            <li>Order number on the package or packing slip inside</li>
+            <li>Photo of packed parcel taken before handoff</li>
+            <li>Tracking number recorded</li>
+            <li>Order marked "shipped" on platform</li>
+            <li>Inventory count updated</li>
+          </ul>
+        </div>
+        <p class="panel-note mt-sm">Full source for all ten appendices: <span class="mono">~/Documents/Business-Partnership/Zapee/zapee-world-sop.html</span>, Appendices A–J.</p>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="reference-section">
+  <span class="eyebrow">Reference</span>
+  <h2>Reference Library</h2>
+  <details>
+    <summary>Daily Standard Operating Procedures (9)</summary>
+    <div class="details-body">
+      <ul>
+        <li><strong>01 Sourcing &amp; Supplier Comms</strong> — Arvin · 2–3 supplier quotes minimum, Arlene approves before ordering</li>
+        <li><strong>02 Sampling &amp; Product Approval</strong> — Arvin/Raymond · no bulk order without a sample approved by Arlene</li>
+        <li><strong>03 Ordering &amp; Restocking</strong> — Arvin · weekly stock check, Arlene approves above ₱3,000</li>
+        <li><strong>04 Receiving &amp; Checking Inventory</strong> — Raymond · photo + count on every delivery</li>
+        <li><strong>05 Repackaging &amp; Labeling</strong> — Raymond · zero improperly labeled units shipped</li>
+        <li><strong>06 Product Listing Creation</strong> — Arvin · live within 48h of approval, Shopee → Lazada → TikTok order</li>
+        <li><strong>07 Order Processing, Packing &amp; Shipping</strong> — Raymond · packed/handed off within 24h</li>
+        <li><strong>08 Return &amp; Refund Handling</strong> — Raymond (≤₱500) / Arvin (₱500+) / Arlene (₱2,000+) · resolved within 3 business days</li>
+        <li><strong>09 Inventory Count &amp; Stock Alerts</strong> — Raymond counts Monday, Arvin reorders · ±2 units accuracy target</li>
+      </ul>
+    </div>
+  </details>
+  <details>
+    <summary>Customer Service Standards</summary>
+    <div class="details-body">
+      <p><strong>Response targets:</strong> Shopee/Lazada chat ≤1h, TikTok messages ≤2h, returns ≤24h, disputes ≤4h. Operating hours 8am–8pm daily.</p>
+      <p><strong>Tone:</strong> Filipino/Taglish unless the buyer writes in English. Friendly, solution-focused, never argue.</p>
+      <p><strong>Escalation:</strong> Raymond handles general inquiries and refunds under ₱500 directly; ₱500–2,000 escalates to Arvin; above ₱2,000 or buyer threats escalate to Arlene.</p>
+    </div>
+  </details>
+  <details>
+    <summary>Exit, Breach &amp; Confidentiality</summary>
+    <div class="details-body">
+      <ul>
+        <li>14 consecutive days unnotified absence = inactive, forfeits that period's share</li>
+        <li>Voluntary exit: 30 days' written notice, settlement within 30 days after last active day</li>
+        <li>Forced removal grounds: unauthorized fund transfer, credential misuse, deliberate harm to supplier/customer relationships, confidential info disclosure</li>
+        <li>Confidentiality obligations survive 2 years past exit</li>
+      </ul>
+    </div>
+  </details>
+  <details>
+    <summary>Source Documents</summary>
+    <div class="details-body">
+      <ul>
+        <li><span class="mono">~/Documents/Business-Partnership/Zapee/zapee-world-sop.html</span> — Internal Operating Agreement &amp; SOP Manual, Draft V0.1. Reflects the 40/30/30 split and the restructured roles (Raymond: online accounts + sourcing→selling; Arlene: receiving→CX + finance execution; Arvin: analytics &amp; tooling) — still pending Arlene's signed sign-off per Section 7.</li>
+        <li><span class="mono">~/Documents/Brain/Zapee Marketplace — 4-Pillar Operating Handbook &amp; Launch Brief.pdf</span></li>
+        <li><span class="mono">~/Documents/Brain/Zapee Content Engine + Personal Brand Playbook.pdf</span></li>
+        <li><span class="mono">~/Documents/Brain/Thumbnail Card &amp; Carousel Design Spec.pdf</span> — the card/carousel system this dashboard is now built on</li>
+      </ul>
+    </div>
+  </details>
+</div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Snapshot dashboard — reflects the 2026-08-21 grilling-session decisions and a one-time Kanban pull. Re-sync before relying on exact status.</p>
+    <p>Zapee World Online Store · Sole Proprietorship of Arlene Zapanta Baluyut · Santa Monica, Santa Rita, Pampanga</p>
+  </div>
+</footer>
