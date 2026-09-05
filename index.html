@@ -99,7 +99,8 @@ header.masthead{padding:34px 0 22px;}
 #fr4:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr4"],
 #fr5:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr5"],
 #fr6:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr6"],
-#fr7:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr7"]{background:var(--orange);color:#fff;}
+#fr7:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr7"],
+#fr8:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr8"]{background:var(--orange);color:#fff;}
 #fr1:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr1"] .tab-dot,
 #fr5:checked ~ .vitals-bar .carousel-nav .tabs label[for="fr5"] .tab-dot{background:#fff;}
 
@@ -109,7 +110,8 @@ header.masthead{padding:34px 0 22px;}
 #fr4:checked ~ .panels .panel[data-panel="4"],
 #fr5:checked ~ .panels .panel[data-panel="5"],
 #fr6:checked ~ .panels .panel[data-panel="6"],
-#fr7:checked ~ .panels .panel[data-panel="7"]{display:block;}
+#fr7:checked ~ .panels .panel[data-panel="7"],
+#fr8:checked ~ .panels .panel[data-panel="8"]{display:block;}
 
 #fr1:checked ~ .vitals-bar .carousel-nav .arrows .arrow[data-show="1"],
 #fr2:checked ~ .vitals-bar .carousel-nav .arrows .arrow[data-show="2"],
@@ -117,7 +119,8 @@ header.masthead{padding:34px 0 22px;}
 #fr4:checked ~ .vitals-bar .carousel-nav .arrows .arrow[data-show="4"],
 #fr5:checked ~ .vitals-bar .carousel-nav .arrows .arrow[data-show="5"],
 #fr6:checked ~ .vitals-bar .carousel-nav .arrows .arrow[data-show="6"],
-#fr7:checked ~ .vitals-bar .carousel-nav .arrows .arrow[data-show="7"]{display:flex;}
+#fr7:checked ~ .vitals-bar .carousel-nav .arrows .arrow[data-show="7"],
+#fr8:checked ~ .vitals-bar .carousel-nav .arrows .arrow[data-show="8"]{display:flex;}
 
 /* SECTION HEADS */
 .eyebrow{display:inline-block;background:var(--blue-500);color:#e1f5ff;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:var(--radius-sm);margin-bottom:8px;}
@@ -340,6 +343,7 @@ footer p{font-size:11.5px;color:var(--text-300);margin:3px 0;}
   <input type="radio" name="fr" id="fr5" class="fr-radio">
   <input type="radio" name="fr" id="fr6" class="fr-radio">
   <input type="radio" name="fr" id="fr7" class="fr-radio">
+  <input type="radio" name="fr" id="fr8" class="fr-radio">
 
   <div class="vitals-bar">
     <div class="vitals">
@@ -357,6 +361,7 @@ footer p{font-size:11.5px;color:var(--text-300);margin:3px 0;}
         <label for="fr5">Compliance<span class="tab-dot tab-dot--warn"></span></label>
         <label for="fr6">Content</label>
         <label for="fr7">Docs</label>
+        <label for="fr8">Sourcing</label>
       </div>
       <div class="arrows">
         <label class="arrow" data-show="2" for="fr1">‹</label>
@@ -365,12 +370,14 @@ footer p{font-size:11.5px;color:var(--text-300);margin:3px 0;}
         <label class="arrow" data-show="5" for="fr4">‹</label>
         <label class="arrow" data-show="6" for="fr5">‹</label>
         <label class="arrow" data-show="7" for="fr6">‹</label>
+        <label class="arrow" data-show="8" for="fr7">‹</label>
         <label class="arrow" data-show="1" for="fr2">›</label>
         <label class="arrow" data-show="2" for="fr3">›</label>
         <label class="arrow" data-show="3" for="fr4">›</label>
         <label class="arrow" data-show="4" for="fr5">›</label>
         <label class="arrow" data-show="5" for="fr6">›</label>
         <label class="arrow" data-show="6" for="fr7">›</label>
+        <label class="arrow" data-show="7" for="fr8">›</label>
       </div>
     </div>
   </div>
@@ -1345,6 +1352,185 @@ footer p{font-size:11.5px;color:var(--text-300);margin:3px 0;}
           </ul>
         </div>
         <p class="panel-note mt-sm">Full source for all ten appendices: <span class="mono">~/Documents/Business-Partnership/Zapee/zapee-world-sop.html</span>, Appendices A–J.</p>
+      </div>
+    </section>
+
+    <!-- PANEL 8 — SOURCING: DIAPERS & WIPES -->
+    <section class="panel" data-panel="8">
+      <div class="panel-inner">
+        <span class="eyebrow">08 · Category Research</span>
+        <h2>Diapers &amp; Wipes — Sourcing Roadmap</h2>
+        <p class="panel-note">TikTok Shop / Shopee / Lazada PH market research, FDA compliance pathway, and Alibaba supplier shortlist for the first candidate product category, condensed into a step-by-step launch plan. Source: Perplexity deep research, run 2026-09-05.</p>
+
+        <div class="kpi-row">
+          <div class="kpi-tile"><div class="kpi-label">Recommended Entry</div><div class="kpi-value" style="font-size:20px;">Wipes first</div><div class="kpi-indicator good">Lighter compliance track</div></div>
+          <div class="kpi-tile"><div class="kpi-label">Lead Alibaba Supplier</div><div class="kpi-value" style="font-size:20px;">Zhejiang Uniquality</div><div class="kpi-indicator">ISO 13485 · GMPC</div></div>
+          <div class="kpi-tile"><div class="kpi-label">Wipes Compliance Runway</div><div class="kpi-value" style="font-size:20px;">2–4 months</div><div class="kpi-indicator">LTO + CPN</div></div>
+          <div class="kpi-tile"><div class="kpi-label">Diapers Compliance</div><div class="kpi-value" style="font-size:20px;">Unconfirmed</div><div class="kpi-indicator warn">Ask FDA CCHUHSRR</div></div>
+        </div>
+
+        <div class="subhead">Roadmap</div>
+
+        <div class="card mt-sm">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+            <h3>1 · Validate the category</h3>
+            <span class="pill pill-good">Done</span>
+          </div>
+          <p class="card-lede">Market research complete — leading brands, price bands, and underserved niches identified.</p>
+          <ul class="mini-checklist">
+            <li>Diapers: Pampers, Huggies, MamyPoko lead; reusable/eco diapers trending on TikTok Shop (~₱190/unit)</li>
+            <li>Wipes: WaterWipes leads premium; Tiny Buds (PH-local) proves demand for natural/organic wipes (₱120–200); unbranded wipes move volume at ~₱38/pack</li>
+            <li>Gaps with real demand, weak supply: substantiated overnight/anti-leak diapers for humidity, verified sensitive-skin wipes, eco/biodegradable lines with real certification (not just marketing claims)</li>
+            <li>Decision: lead with wipes — lighter compliance track (Cosmetic CPN) than diapers (HUHS, possibly CPR)</li>
+          </ul>
+        </div>
+
+        <div class="card mt-sm">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+            <h3>2 · Lock the regulatory pathway</h3>
+            <span class="pill pill-warn">Not started</span>
+          </div>
+          <p class="card-lede">FDA PH classifies diapers and wipes differently — confirm both before spending on inventory.</p>
+          <ul class="mini-checklist">
+            <li>Wipes = cosmetic: apply for a cosmetic-establishment LTO, then file a Cosmetic Product Notification (CPN) via the FDA ePortal — INCI-format ingredients, label artwork, Product Information File</li>
+            <li>Diapers = Household/Urban Hazardous Substance (HUHS): call FDA's CCHUHSRR directly to confirm whether the 2025–2026 transitory advisory still allows LTO-only distribution, or whether a full Certificate of Product Registration (CPR) + GHS-format SDS is required now</li>
+            <li>If selling under our own brand, we are the Market Authorization Holder — budget the paperwork accordingly</li>
+            <li>Budget: 2–4 months end-to-end for wipes LTO+CPN; diaper timeline depends on the CCHUHSRR answer above</li>
+          </ul>
+        </div>
+
+        <div class="card mt-sm">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+            <h3>3 · Vet and shortlist Alibaba suppliers</h3>
+            <span class="pill pill-warn">Not started</span>
+          </div>
+          <p class="card-lede">Certifications on public listings are thin, especially for diapers — verify everything directly.</p>
+          <ul class="mini-checklist">
+            <li>Wipes: contact Zhejiang Uniquality (ISO 13485, GMPC, clean-room) and Zibo Langqiao (FSC, OEKO-TEX 100, ISO 22716) as lead and backup</li>
+            <li>Diapers: none of the shortlisted suppliers (Unihopes, Guangdong Alloves, Yoursun) disclosed certifications publicly — request cert numbers and verify each directly through the issuing lab's own portal (SGS, Bureau Veritas, Intertek, OEKO-TEX, TÜV all support this)</li>
+            <li>Explicitly ask every supplier for Philippines or Southeast Asia export history — none of the public profiles confirmed PH-specific shipments</li>
+            <li>Confirm MOQ, unit cost, and lead time in writing; insist on Alibaba Trade Assurance (30% deposit / 70% before shipment is standard)</li>
+          </ul>
+        </div>
+
+        <div class="card mt-sm">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+            <h3>4 · Order and test samples</h3>
+            <span class="pill pill-neutral">Not started</span>
+          </div>
+          <p class="card-lede">Never commit to bulk before physically testing a paid sample and its paperwork.</p>
+          <ul class="mini-checklist">
+            <li>Order paid samples ($10–50 + shipping, 3–5 day turnaround) from the top 1–2 candidates per category</li>
+            <li>Request alongside the sample: MSDS (GHS format), Certificate of Analysis, and a third-party lab test report (SGS / Intertek / Bureau Veritas)</li>
+            <li>For any eco/biodegradable claim, require an accredited lab report specifically (OK Compost HOME, TÜV Austria, or DIN CERTCO) — reject self-declared "eco-friendly" language</li>
+            <li>Physically test: leakage/absorbency for diapers, skin feel and scent for wipes, packaging quality for both</li>
+          </ul>
+        </div>
+
+        <div class="card mt-sm">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+            <h3>5 · File FDA compliance</h3>
+            <span class="pill pill-neutral">Not started</span>
+          </div>
+          <p class="card-lede">Use the sample-stage lab reports as the substantiation FDA will ask for.</p>
+          <ul class="mini-checklist">
+            <li>Wipes: file the CPN once the cosmetic-establishment LTO is active — start early, it runs in parallel with supplier vetting</li>
+            <li>Diapers: file LTO (+ CPR if CCHUHSRR confirms it's still required) with the GHS SDS obtained from the supplier</li>
+            <li>Never put "hypoallergenic," "dermatologically tested," or "organic" on a label without the lab report from step 4 to back it</li>
+          </ul>
+        </div>
+
+        <div class="card mt-sm">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+            <h3>6 · Place the bulk order and import</h3>
+            <span class="pill pill-neutral">Not started</span>
+          </div>
+          <p class="card-lede">Budget 60–100 days door-to-Manila — that clock only starts once compliance paperwork is in hand.</p>
+          <ul class="mini-checklist">
+            <li>Pay via Trade Assurance; request a Certificate of Origin (Form E) to qualify for 0% duty under ACFTA (HS code 9619.00.11) instead of the standard 3–30% MFN rate</li>
+            <li>Budget 12% VAT on landed cost (CIF + duty + port charges) in the margin model</li>
+            <li>Register with BOC's Client Profile Registration System (CPRS) and engage a customs broker for the Single Administrative Document</li>
+            <li>Commission a third-party pre-shipment inspection for the first bulk order — sample-vs-bulk mismatch is the most common failure mode</li>
+          </ul>
+        </div>
+
+        <div class="card mt-sm">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+            <h3>7 · List and launch</h3>
+            <span class="pill pill-neutral">Not started</span>
+          </div>
+          <p class="card-lede">Listing itself doesn't depend on the TikTok Partner Center API work that's currently on hold.</p>
+          <ul class="mini-checklist">
+            <li>Upload the FDA LTO/CPN (and CPR if applicable) into each marketplace's seller compliance center — TikTok Shop rejects regulated-category listings outright without this</li>
+            <li>Price against the market snapshot below; wipes have room at both the natural/local-brand tier (Tiny Buds gap) and the value tier</li>
+            <li>This is a manual Seller Center listing, independent of the TikTok Partner Center developer-app work parked until the one-year company-age rule clears — it does not need to wait on that</li>
+          </ul>
+        </div>
+
+        <div class="subhead">Market Snapshot — Shopee / Lazada / TikTok Shop PH</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Category</th><th>Leading brand</th><th>Price range</th><th>Note</th></tr></thead>
+            <tbody>
+              <tr><td>Diapers (premium)</td><td>Pampers Premium Care</td><td class="mono">₱1,800–4,500/pack</td><td>Best overall pick, Shopee PH</td></tr>
+              <tr><td>Diapers (newborn, tape)</td><td>Huggies Skin Perfect</td><td class="mono">Mid-tier, 40-pc packs</td><td>Hypoallergenic claim, top 0–5kg pick</td></tr>
+              <tr><td>Diapers (reusable/eco)</td><td>TikTok Shop generic</td><td class="mono">~₱190/unit</td><td>"Best Seller" tag, growing niche</td></tr>
+              <tr><td>Wipes (premium)</td><td>WaterWipes</td><td class="mono">₱350–550/pack</td><td>Purified-water formula, top overall</td></tr>
+              <tr><td>Wipes (local/natural)</td><td>Tiny Buds</td><td class="mono">₱120–200/pack</td><td>PH-origin brand, validates natural niche</td></tr>
+              <tr><td>Wipes (budget)</td><td>Unbranded</td><td class="mono">~₱38/pack</td><td>Highest volume, thinnest margin</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subhead">Alibaba Supplier Shortlist</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Supplier</th><th>Category</th><th>Certifications</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Zhejiang Uniquality</td><td>Wipes (OEM/ODM)</td><td>ISO 13485, GMPC, clean-room</td><td><span class="pill pill-good">Lead</span></td></tr>
+              <tr><td>Zibo Langqiao</td><td>Wipes (sensitive/eco)</td><td>FSC, OEKO-TEX 100, ISO 22716</td><td><span class="pill pill-neutral">Backup</span></td></tr>
+              <tr><td>Unihopes (Fujian)</td><td>Diapers (pant-style)</td><td>Not disclosed</td><td><span class="pill pill-warn">Needs cert request</span></td></tr>
+              <tr><td>Guangdong Alloves</td><td>Diapers (multi-category)</td><td>Not disclosed</td><td><span class="pill pill-warn">Needs cert request</span></td></tr>
+              <tr><td>Yoursun (Quanzhou)</td><td>Diapers</td><td>Not disclosed; own brand, SEA distribution</td><td><span class="pill pill-warn">Needs cert request</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subhead">Compliance at a Glance</div>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Wipes — Cosmetic</h3>
+            <ul class="mini-checklist">
+              <li>Secure a cosmetic-establishment LTO</li>
+              <li>File a Cosmetic Product Notification (CPN) via FDA ePortal — INCI ingredient list, label artwork, Product Information File</li>
+              <li>Notification processing: 5–15 working days once the LTO is active</li>
+              <li>Total runway: ~2–4 months</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Diapers — HUHS</h3>
+            <ul class="mini-checklist">
+              <li>Secure an LTO</li>
+              <li>Confirm with FDA CCHUHSRR whether the current transitory advisory still waives the CPR, or whether a full Certificate of Product Registration + GHS-format SDS is required</li>
+              <li>If CPR is required: supplier must supply lab test reports (SGS/Intertek/Bureau Veritas) to support the filing</li>
+              <li>Total runway: unconfirmed — depends on the CCHUHSRR answer above</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="subhead">Red Flags — Disqualify Immediately</div>
+        <div class="card">
+          <ul class="mini-checklist">
+            <li>Asks to be paid outside Alibaba Trade Assurance (personal account, wire, crypto)</li>
+            <li>Quote is 40%+ below competing suppliers for the same spec</li>
+            <li>Refuses a paid physical sample or won't share a verifiable business license/USCC</li>
+            <li>Cites a certification without a document number checkable on the issuer's own portal</li>
+            <li>"Eco-friendly" / "biodegradable" claimed with no accredited lab report (OK Compost HOME, TÜV Austria, DIN CERTCO)</li>
+            <li>Approved sample looks nothing like the bulk shipment that arrives — mitigate with pre-shipment inspection</li>
+          </ul>
+        </div>
+
+        <p class="panel-note mt-sm">Full detail with citations: <span class="mono">~/Documents/Brain/Perplexity Output/diapers and wipes.md</span> and <span class="mono">~/Documents/Brain/Perplexity Output/alibaba suppliers -diapers and wipes.md</span>.</p>
       </div>
     </section>
 
